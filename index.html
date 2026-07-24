@@ -73,14 +73,17 @@
     border: 1px solid #222; cursor: pointer;
   }
   .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+  .card.top1 { border-color: #ffd700; box-shadow: 0 0 24px rgba(255,215,0,.12); }
+  .card.top2 { border-color: #c0c0c0; box-shadow: 0 0 20px rgba(192,192,192,.08); }
+  .card.top3 { border-color: #cd7f32; box-shadow: 0 0 20px rgba(205,127,50,.08); }
+  .card.top4 { border-color: var(--accent2); }
 
   .card-img-wrap {
-    width: 100%; background: #111; display: flex; align-items: center;
-    justify-content: center; overflow: hidden;
+    width: 100%; height: 320px; background: #111; overflow: hidden;
   }
   .card-img-wrap img {
-    width: 100%; max-height: 400px; object-fit: contain;
-    transition: opacity .3s; background: #111;
+    width: 100%; height: 100%; object-fit: cover;
+    transition: opacity .3s;
   }
   .card-img-wrap img.loading { opacity: 0; }
   .card-img-wrap img.loaded { opacity: 1; }
@@ -214,7 +217,7 @@
     .card-body { padding: 8px 10px 10px; }
     .vote-btn { padding: 4px 10px; font-size: .7rem; }
     .toolbar { top: 115px; }
-    .card-img-wrap img { max-height: 260px; }
+    .card-img-wrap { height: 200px; }
     .lightbox img { max-width: 96vw; max-height: 70vh; }
   }
 </style>
@@ -238,10 +241,10 @@
   </div>
   <div class="sort-bar" id="sortBar">
     <label>排序</label>
-    <button class="sort-btn active" data-sort="default">預設</button>
+    <button class="sort-btn active" data-sort="votes">最多票</button>
     <button class="sort-btn" data-sort="likes">最多讚</button>
     <button class="sort-btn" data-sort="score">最高分</button>
-    <button class="sort-btn" data-sort="votes">最多票</button>
+    <button class="sort-btn" data-sort="default">預設</button>
   </div>
 </div>
 
@@ -318,7 +321,7 @@ const VOTER_ID = getVoterId();
 let designs = [];
 let userVotes = {};
 let currentCat = 'all';
-let currentSort = 'default';
+let currentSort = 'votes';
 let deleteTarget = null;
 let isAdmin = sessionStorage.getItem('moodhu_admin') === '1';
 
@@ -516,9 +519,10 @@ async function renderGallery() {
     const myVote = myVotes[d.id];
     const isTop5 = currentCat === '__top5__';
     const rank = i + 1;
+    const topClass = !isTop5 && rank <= 4 ? ` top${rank}` : '';
 
     html += `
-      <div class="card" data-id="${d.id}">
+      <div class="card${topClass}" data-id="${d.id}">
         <div class="card-img-wrap" onclick="openLightbox('${d.id}')">
           <img class="loading" loading="lazy" src="images/${d.filename}"
                alt="${d.title}" onload="this.classList.remove('loading');this.classList.add('loaded')"
