@@ -9,11 +9,11 @@
     --bg: #0d0d0d; --surface: #1a1a2e; --card: #16213e;
     --accent: #e94560; --accent2: #0f3460; --text: #eee;
     --text2: #aaa; --like: #4ade80; --dislike: #f87171;
-    --radius: 12px;
+    --gold: #fbbf24; --radius: 12px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-  
+
   header {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     padding: 24px 20px 16px; text-align: center;
@@ -28,11 +28,15 @@
     font-size: 0.8rem; color: var(--text2); flex-wrap: wrap;
   }
   .stats-bar strong { color: var(--text); }
-  
-  .cat-bar {
-    display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto;
+
+  /* tool bar: categories + sort */
+  .toolbar {
     background: var(--surface); border-bottom: 1px solid #222;
-    position: sticky; top: 123px; z-index: 99; scrollbar-width: none;
+    position: sticky; top: 123px; z-index: 99;
+  }
+  .cat-bar {
+    display: flex; gap: 8px; padding: 10px 16px; overflow-x: auto;
+    scrollbar-width: none;
   }
   .cat-bar::-webkit-scrollbar { display: none; }
   .cat-btn {
@@ -42,31 +46,46 @@
   }
   .cat-btn:hover { border-color: var(--accent); color: var(--text); }
   .cat-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .cat-btn.top5 { border-color: var(--gold); color: var(--gold); }
+  .cat-btn.top5.active { background: var(--gold); color: #000; border-color: var(--gold); }
 
+  .sort-bar {
+    display: flex; gap: 8px; padding: 4px 16px 10px; align-items: center;
+  }
+  .sort-bar label { color: var(--text2); font-size: .75rem; margin-right: 4px; }
+  .sort-btn {
+    padding: 3px 12px; border-radius: 12px; border: 1px solid #333;
+    background: transparent; color: var(--text2); cursor: pointer;
+    font-size: .72rem; transition: all .2s;
+  }
+  .sort-btn:hover { border-color: var(--accent2); color: var(--text); }
+  .sort-btn.active { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+
+  /* gallery */
   .gallery {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 16px; padding: 16px; max-width: 1400px; margin: 0 auto;
   }
-  
+
   .card {
     background: var(--card); border-radius: var(--radius); overflow: hidden;
     transition: transform .2s, box-shadow .2s;
-    border: 1px solid #222; position: relative;
+    border: 1px solid #222; cursor: pointer;
   }
   .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.4); }
-  
+
   .card-img-wrap {
-    position: relative; width: 100%; padding-top: 75%;
-    background: #111; overflow: hidden;
+    width: 100%; background: #111; display: flex; align-items: center;
+    justify-content: center; overflow: hidden;
   }
   .card-img-wrap img {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    object-fit: cover; transition: opacity .3s;
+    width: 100%; max-height: 400px; object-fit: contain;
+    transition: opacity .3s; background: #111;
   }
   .card-img-wrap img.loading { opacity: 0; }
   .card-img-wrap img.loaded { opacity: 1; }
-  
-  .card-body { padding: 12px 14px 14px; }
+
+  .card-body { padding: 12px 14px 14px; cursor: default; }
   .card-title {
     font-size: .85rem; font-weight: 600; margin-bottom: 4px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -75,7 +94,15 @@
     font-size: .7rem; color: var(--accent); opacity: .8;
     margin-bottom: 8px;
   }
-  
+  .card-rank {
+    display: inline-block; font-size: .65rem; font-weight: 700;
+    background: var(--gold); color: #000; padding: 1px 8px;
+    border-radius: 10px; margin-bottom: 6px;
+  }
+  .card-rank.top1 { background: #ffd700; }
+  .card-rank.top2 { background: #c0c0c0; }
+  .card-rank.top3 { background: #cd7f32; }
+
   .vote-row {
     display: flex; align-items: center; gap: 10px;
   }
@@ -91,7 +118,7 @@
   .vote-btn .count { font-weight: 700; min-width: 16px; text-align: center; }
   .vote-btn .icon { font-size: 1rem; line-height: 1; }
   .vote-btn.loading { pointer-events: none; opacity: .5; }
-  
+
   .del-btn {
     margin-left: auto; padding: 5px 10px; border-radius: 8px;
     border: 1px solid transparent; background: transparent;
@@ -101,7 +128,35 @@
   .card:hover .del-btn { opacity: .5; }
   .del-btn:hover { color: var(--dislike); border-color: var(--dislike); opacity: 1 !important; }
   .del-btn.auth { opacity: .5; }
-  
+
+  /* Lightbox */
+  .lightbox {
+    display: none; position: fixed; inset: 0; z-index: 998;
+    background: rgba(0,0,0,.92); align-items: center; justify-content: center;
+    backdrop-filter: blur(8px); flex-direction: column;
+  }
+  .lightbox.show { display: flex; }
+  .lightbox-close {
+    position: absolute; top: 16px; right: 24px;
+    font-size: 2rem; color: #fff; cursor: pointer;
+    background: none; border: none; z-index: 1;
+    opacity: .6; transition: opacity .2s;
+  }
+  .lightbox-close:hover { opacity: 1; }
+  .lightbox img {
+    max-width: 92vw; max-height: 80vh; object-fit: contain;
+    border-radius: 8px;
+  }
+  .lightbox-info {
+    text-align: center; margin-top: 16px; color: var(--text2);
+    font-size: .85rem;
+  }
+  .lightbox-info .title { color: #fff; font-weight: 600; }
+  .lightbox-info .cat { color: var(--accent); font-size: .75rem; }
+  .lightbox .vote-row { margin-top: 12px; justify-content: center; }
+  .lightbox .vote-btn { font-size: 1rem; padding: 8px 20px; }
+
+  /* Admin Modal */
   .modal-overlay {
     display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7);
     z-index: 999; align-items: center; justify-content: center;
@@ -130,7 +185,7 @@
   .modal .btn-cancel { background: #222; color: var(--text); }
   .modal .btn-cancel:hover { background: #333; }
   .modal .error { color: var(--dislike); font-size: .8rem; margin-top: 8px; display: none; }
-  
+
   .toast {
     position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
     background: #222; color: var(--text); padding: 10px 24px;
@@ -141,24 +196,26 @@
   .toast.show { opacity: 1; }
   .toast.success { border-color: var(--like); }
   .toast.error { border-color: var(--dislike); }
-  
+
   .loading-gallery {
     display: flex; align-items: center; justify-content: center;
     min-height: 60vh; color: var(--text2);
   }
   .spinner { width: 36px; height: 36px; border: 3px solid #333; border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-  
+
   .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
   .empty-state .big-icon { font-size: 3rem; margin-bottom: 12px; }
-  
+
   @media (max-width: 640px) {
     .gallery { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; padding: 10px; }
     header h1 { font-size: 1.2rem; }
     .stats-bar { gap: 12px; font-size: .7rem; }
     .card-body { padding: 8px 10px 10px; }
     .vote-btn { padding: 4px 10px; font-size: .7rem; }
-    .cat-bar { top: 115px; padding: 8px 10px; }
+    .toolbar { top: 115px; }
+    .card-img-wrap img { max-height: 260px; }
+    .lightbox img { max-width: 96vw; max-height: 70vh; }
   }
 </style>
 </head>
@@ -169,13 +226,23 @@
   <p>票選你最喜歡的海洋設計作品</p>
   <div class="stats-bar">
     <span>📊 總投票 <strong id="totalVotes">0</strong></span>
-    <span>🏆 最受歡迎 <strong id="topDesign">-</strong></span>
+    <span>🏆 Top 1 <strong id="topDesign">-</strong></span>
     <span>👤 投票人數 <strong id="voterCount">0</strong></span>
   </div>
 </header>
 
-<div class="cat-bar" id="catBar">
-  <button class="cat-btn active" data-cat="all">全部</button>
+<div class="toolbar">
+  <div class="cat-bar" id="catBar">
+    <button class="cat-btn active" data-cat="all">🖼️ 全部</button>
+    <button class="cat-btn top5" data-cat="__top5__">🏆 Top 5</button>
+  </div>
+  <div class="sort-bar" id="sortBar">
+    <label>排序</label>
+    <button class="sort-btn active" data-sort="default">預設</button>
+    <button class="sort-btn" data-sort="likes">最多讚</button>
+    <button class="sort-btn" data-sort="score">最高分</button>
+    <button class="sort-btn" data-sort="votes">最多票</button>
+  </div>
 </div>
 
 <div id="gallery" class="gallery">
@@ -187,6 +254,18 @@
   <p>這個分類還沒有作品</p>
 </div>
 
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lbImg" src="" alt="">
+  <div class="lightbox-info">
+    <div class="title" id="lbTitle"></div>
+    <div class="cat" id="lbCat"></div>
+    <div class="vote-row" id="lbVoteRow"></div>
+  </div>
+</div>
+
+<!-- Admin Modal -->
 <div class="modal-overlay" id="adminModal">
   <div class="modal">
     <h3>🔑 管理員驗證</h3>
@@ -204,17 +283,14 @@
 
 <script>
 // ═══════════════════════════════════════════════════
-//  API 基礎路徑（Zeabur 部署自動適應）
+//  設定
 // ═══════════════════════════════════════════════════
 const API_BASE = (() => {
-  // 如果是 Zeabur 部署，API 在同個網域
   const loc = window.location;
-  if (loc.hostname === 'localhost' || loc.hostname === '127.0.0.1') {
+  if (loc.hostname === 'localhost' || loc.hostname === '127.0.0.1')
     return `http://${loc.hostname}:8000`;
-  }
   return loc.origin;
 })();
-
 const ADMIN_PASSWORD = 'moodhu2024';
 
 // ═══════════════════════════════════════════════════
@@ -224,16 +300,11 @@ function getVoterId() {
   let vid = localStorage.getItem('moodhu_voter_id');
   if (!vid) {
     const fp = [
-      navigator.userAgent,
-      screen.width, screen.height, screen.colorDepth,
-      navigator.language,
-      Intl.DateTimeFormat().resolvedOptions().timeZone
+      navigator.userAgent, screen.width, screen.height, screen.colorDepth,
+      navigator.language, Intl.DateTimeFormat().resolvedOptions().timeZone
     ].join('||');
     let hash = 0;
-    for (let i = 0; i < fp.length; i++) {
-      hash = ((hash << 5) - hash) + fp.charCodeAt(i);
-      hash |= 0;
-    }
+    for (let i = 0; i < fp.length; i++) { hash = ((hash << 5) - hash) + fp.charCodeAt(i); hash |= 0; }
     vid = 'v_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
     localStorage.setItem('moodhu_voter_id', vid);
   }
@@ -247,11 +318,12 @@ const VOTER_ID = getVoterId();
 let designs = [];
 let userVotes = {};
 let currentCat = 'all';
+let currentSort = 'default';
 let deleteTarget = null;
 let isAdmin = sessionStorage.getItem('moodhu_admin') === '1';
 
 // ═══════════════════════════════════════════════════
-//  API 呼叫
+//  API
 // ═══════════════════════════════════════════════════
 async function apiGet(path) {
   const r = await fetch(`${API_BASE}${path}`);
@@ -260,9 +332,7 @@ async function apiGet(path) {
 }
 async function apiPost(path, body) {
   const r = await fetch(`${API_BASE}${path}`, {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(body)
+    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
   });
   if (!r.ok) throw new Error(await r.text());
   return r.json();
@@ -314,40 +384,83 @@ document.getElementById('adminModal').onclick = function(e) {
 };
 
 // ═══════════════════════════════════════════════════
+//  Lightbox
+// ═══════════════════════════════════════════════════
+let lbDesignId = null;
+function openLightbox(designId) {
+  lbDesignId = designId;
+  const d = designs.find(x => x.id === designId);
+  if (!d) return;
+  document.getElementById('lbImg').src = `images/${d.filename}`;
+  document.getElementById('lbTitle').textContent = d.title;
+  document.getElementById('lbCat').textContent = d.category;
+
+  // 重建 lightbox 內的投票按鈕（使用最新票數）
+  const vb = document.getElementById('lbVoteRow');
+  const vc = window._lastVoteCounts?.[designId] || { likes: 0, dislikes: 0 };
+  const my = userVotes[designId];
+  vb.innerHTML = `
+    <button class="vote-btn like ${my === 'like' ? 'active' : ''}" onclick="castVote('${designId}','like');event.stopPropagation()">
+      <span class="icon">👍</span> <span class="count">${vc.likes}</span>
+    </button>
+    <button class="vote-btn dislike ${my === 'dislike' ? 'active' : ''}" onclick="castVote('${designId}','dislike');event.stopPropagation()">
+      <span class="icon">👎</span> <span class="count">${vc.dislikes}</span>
+    </button>`;
+
+  document.getElementById('lightbox').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox(e) {
+  if (e && e.target !== e.currentTarget) return; // only close on overlay click
+  document.getElementById('lightbox').classList.remove('show');
+  document.body.style.overflow = '';
+  lbDesignId = null;
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightbox();
+});
+
+// ═══════════════════════════════════════════════════
 //  核心功能
 // ═══════════════════════════════════════════════════
 async function castVote(designId, voteType) {
-  const btn = event.currentTarget;
-  btn.classList.add('loading');
+  const btn = event?.currentTarget;
+  if (btn) btn.classList.add('loading');
   try {
     const result = await apiPost(`/api/vote?voter_id=${encodeURIComponent(VOTER_ID)}`, {
-      design_id: designId,
-      vote_type: voteType
+      design_id: designId, vote_type: voteType
     });
-    
-    // 更新本地狀態
-    const my = result.my || {};
-    userVotes = my;
-    
+    userVotes = result.my || {};
     await renderGallery();
     await updateStats();
-    
-    const action = result.action;
-    const msg = action === 'removed' ? '✅ 已取消投票' : '✅ 投票成功！';
+    // 如果 lightbox 開著且是同一個設計，更新 lightbox 按鈕
+    if (lbDesignId === designId) {
+      const vc = (result.votes || {})[designId] || { likes: 0, dislikes: 0 };
+      const my = userVotes[designId];
+      const vb = document.getElementById('lbVoteRow');
+      vb.innerHTML = `
+        <button class="vote-btn like ${my === 'like' ? 'active' : ''}" onclick="castVote('${designId}','like');event.stopPropagation()">
+          <span class="icon">👍</span> <span class="count">${vc.likes}</span>
+        </button>
+        <button class="vote-btn dislike ${my === 'dislike' ? 'active' : ''}" onclick="castVote('${designId}','dislike');event.stopPropagation()">
+          <span class="icon">👎</span> <span class="count">${vc.dislikes}</span>
+        </button>`;
+    }
+    const msg = result.action === 'removed' ? '✅ 已取消投票' : '✅ 投票成功！';
     showToast(msg, 'success');
   } catch(e) {
     showToast('⚠️ 投票失敗', 'error');
   } finally {
-    btn.classList.remove('loading');
+    if (btn) btn.classList.remove('loading');
   }
 }
 
 async function doDelete(designId) {
   try {
-    await apiPost('/api/delete', {
-      design_id: designId,
-      password: ADMIN_PASSWORD
-    });
+    await apiPost('/api/delete', { design_id: designId, password: ADMIN_PASSWORD });
+    // ★ 關鍵修復：重新從 API 載入 designs 列表（已過濾刪除）
+    const data = await apiGet('/api/designs');
+    designs = data.designs || [];
     showToast('🗑️ 已刪除作品', 'success');
     await renderGallery();
     await updateStats();
@@ -359,19 +472,7 @@ async function doDelete(designId) {
 async function renderGallery() {
   const container = document.getElementById('gallery');
   const empty = document.getElementById('emptyState');
-  
-  let filtered = designs;
-  if (currentCat !== 'all') {
-    filtered = designs.filter(d => d.category === currentCat);
-  }
-  
-  if (filtered.length === 0) {
-    container.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-  
+
   // 載入投票數 + 我的投票
   let voteCounts = {}, myVotes = {};
   try {
@@ -381,20 +482,50 @@ async function renderGallery() {
     ]);
   } catch(e) {}
   userVotes = myVotes;
-  
+  window._lastVoteCounts = voteCounts; // 給 lightbox 用
+
+  // 過濾
+  let filtered = [...designs];
+  if (currentCat === '__top5__') {
+    // Top 5: 依淨好感度排序取前 5
+    filtered.sort((a, b) => {
+      const sa = (voteCounts[a.id]?.likes || 0) - (voteCounts[a.id]?.dislikes || 0);
+      const sb = (voteCounts[b.id]?.likes || 0) - (voteCounts[b.id]?.dislikes || 0);
+      return sb - sa;
+    });
+    filtered = filtered.slice(0, 5);
+  } else if (currentCat !== 'all') {
+    filtered = designs.filter(d => d.category === currentCat);
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // 排序（非 Top5 模式才套用）
+  if (currentCat !== '__top5__') {
+    applySort(filtered, voteCounts);
+  }
+
   let html = '';
-  for (const d of filtered) {
+  filtered.forEach((d, i) => {
     const vc = voteCounts[d.id] || { likes: 0, dislikes: 0 };
     const myVote = myVotes[d.id];
-    
+    const isTop5 = currentCat === '__top5__';
+    const rank = i + 1;
+
     html += `
       <div class="card" data-id="${d.id}">
-        <div class="card-img-wrap">
+        <div class="card-img-wrap" onclick="openLightbox('${d.id}')">
           <img class="loading" loading="lazy" src="images/${d.filename}"
                alt="${d.title}" onload="this.classList.remove('loading');this.classList.add('loaded')"
                onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%23333%22 width=%22200%22 height=%22200%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2214%22>載入失敗</text></svg>'">
         </div>
         <div class="card-body">
+          ${isTop5 ? `<div class="card-rank top${Math.min(rank,3)}">#${rank}</div>` : ''}
           <div class="card-title">${d.title}</div>
           <div class="card-cat">${d.category}</div>
           <div class="vote-row">
@@ -404,13 +535,34 @@ async function renderGallery() {
             <button class="vote-btn dislike ${myVote === 'dislike' ? 'active' : ''}" onclick="castVote('${d.id}','dislike')">
               <span class="icon">👎</span> <span class="count">${vc.dislikes || 0}</span>
             </button>
-            <button class="del-btn ${isAdmin ? 'auth' : ''}" onclick="openAdminModal('${d.id}')" title="刪除">🗑️</button>
+            <button class="del-btn ${isAdmin ? 'auth' : ''}" onclick="event.stopPropagation();openAdminModal('${d.id}')" title="刪除">🗑️</button>
           </div>
         </div>
       </div>`;
-  }
-  
+  });
+
   container.innerHTML = html;
+}
+
+function applySort(arr, voteCounts) {
+  const s = currentSort;
+  if (s === 'default') {
+    arr.sort((a, b) => designs.indexOf(a) - designs.indexOf(b));
+  } else if (s === 'likes') {
+    arr.sort((a, b) => (voteCounts[b.id]?.likes || 0) - (voteCounts[a.id]?.likes || 0));
+  } else if (s === 'score') {
+    arr.sort((a, b) => {
+      const sa = (voteCounts[a.id]?.likes || 0) - (voteCounts[a.id]?.dislikes || 0);
+      const sb = (voteCounts[b.id]?.likes || 0) - (voteCounts[b.id]?.dislikes || 0);
+      return sb - sa;
+    });
+  } else if (s === 'votes') {
+    arr.sort((a, b) => {
+      const ta = (voteCounts[a.id]?.likes || 0) + (voteCounts[a.id]?.dislikes || 0);
+      const tb = (voteCounts[b.id]?.likes || 0) + (voteCounts[b.id]?.dislikes || 0);
+      return tb - ta;
+    });
+  }
 }
 
 async function updateStats() {
@@ -423,7 +575,7 @@ async function updateStats() {
 }
 
 // ═══════════════════════════════════════════════════
-//  Category 過濾
+//  分類 & 排序控制
 // ═══════════════════════════════════════════════════
 function buildCats() {
   const cats = [...new Set(designs.map(d => d.category))].sort();
@@ -446,32 +598,44 @@ function filterCat(cat) {
   renderGallery();
 }
 
+// 排序按鈕
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentSort = this.dataset.sort;
+    renderGallery();
+  });
+});
+
+// 分類按鈕委派（含 Top5）
+document.getElementById('catBar').addEventListener('click', function(e) {
+  if (e.target.classList.contains('cat-btn')) {
+    currentCat = e.target.dataset.cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    renderGallery();
+  }
+});
+
 // ═══════════════════════════════════════════════════
 //  啟動
 // ═══════════════════════════════════════════════════
 async function init() {
   try {
-    // 載入 designs list（從 API 或 JSON fallback）
     let data;
     try {
       data = await apiGet('/api/designs');
       designs = data.designs || [];
     } catch(e) {
-      // fallback: 直接讀 designs.json
       const resp = await fetch('designs.json');
       const j = await resp.json();
       designs = j.designs;
     }
-    
     buildCats();
     await renderGallery();
     await updateStats();
-    
-    if (isAdmin) {
-      document.querySelectorAll('.del-btn').forEach(b => b.classList.add('auth'));
-    }
-    
-    // 定時刷新統計 (30s)
+    if (isAdmin) document.querySelectorAll('.del-btn').forEach(b => b.classList.add('auth'));
     setInterval(updateStats, 30000);
   } catch(e) {
     console.error('Init error:', e);
