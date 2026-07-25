@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moodhu Maldives - Fin Blade Design Gallery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0f1a; --bg-elevated: #111827; --card: #151e2e;
+            --border: #1e2a3a; --primary: #00d4aa; --primary-glow: #00d4aa40;
+            --text: #e8f0f8; --text-muted: #8b9cb3; --accent: #ff6b4a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh;
+            background-image: radial-gradient(ellipse at 20% 0%, #1a2a3a 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, #1a1a2e 0%, transparent 50%); }
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem 1rem; }
+        header { text-align: center; padding: 2rem 0 3rem; }
+        h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.02em; }
+        .subtitle { color: var(--text-muted); margin-top: 0.5rem; font-size: 1.1rem; font-weight: 300; }
+        .stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted); }
+        .stat { display: flex; align-items: center; gap: 0.4rem; }
+        .stat-value { color: var(--primary); font-weight: 500; }
+        .filters { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 2rem; padding: 0 0.5rem; }
+        .filter-btn { background: var(--card); border: 1px solid var(--border); color: var(--text-muted); padding: 0.5rem 1rem; border-radius: 2rem; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .filter-btn:hover { border-color: var(--primary); color: var(--text); }
+        .filter-btn.active { background: var(--primary); border-color: var(--primary); color: var(--bg); font-weight: 500; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; position: relative; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -20px var(--primary-glow); border-color: var(--primary); }
+        .card-image { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; background: var(--bg-elevated); }
+        .card-content { padding: 1rem 1.25rem 1.25rem; }
+        .card-theme { display: inline-block; background: var(--primary-glow); color: var(--primary); font-size: 0.7rem; font-weight: 500; padding: 0.25rem 0.6rem; border-radius: 1rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .card-title { font-size: 1rem; font-weight: 500; margin-bottom: 0.25rem; line-height: 1.3; }
+        .card-style { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .card-aspect { display: inline-block; font-size: 0.65rem; background: var(--bg); color: var(--text-muted); padding: 0.15rem 0.4rem; border-radius: 0.3rem; }
+        .vote-btn { width: 100%; margin-top: 1rem; padding: 0.75rem; background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 8px; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s; }
+        .vote-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-glow); }
+        .vote-btn.voted { background: var(--primary); border-color: var(--primary); color: var(--bg); font-weight: 500; cursor: default; }
+        .vote-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .vote-count { font-variant-numeric: tabular-nums; }
+        .vote-icon { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.5; transition: fill 0.2s; }
+        .vote-btn.voted .vote-icon { fill: currentColor; stroke: currentColor; }
+        .empty-state { grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted); }
+        footer { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border); margin-top: 3rem; }
+        @media (max-width: 600px) { .gallery { grid-template-columns: 1fr; } .filters { overflow-x: auto; justify-content: flex-start; padding-bottom: 0.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Moodhu Maldives</h1>
+            <p class="subtitle">Fin Blade Design Gallery · 鯜йѓЁйњ†иЄ¬и§†жѓџ</p>
+            <div class="stats">
+                <span class="stat"><span class="stat-value" id="totalDesigns">—</span> 設計</span>
+                <span class="stat"><span class="stat-value" id="totalVotes">—</span> 票數</span>
+            </div>
+        </header>
+        <nav class="filters" id="filters" role="tablist"><button class="filter-btn active" data-filter="all" role="tab" aria-selected="true">全部</button></nav>
+        <main class="gallery" id="gallery" role="list"><div class="empty-state">載入中…</div></main>
+        <footer><p>Moodhu Maldives · 由 LOVART AI 設計 · 部署於 Zeabur</p></footer>
+    </div>
+    <script>
+        let designs = []; let currentFilter = 'all'; let votedDesigns = new Set();
+        try { const stored = localStorage.getItem('moodhu_voted'); if (stored) votedDesigns = new Set(JSON.parse(stored)); } catch {}
+        const gallery = document.getElementById('gallery'); const filtersEl = document.getElementById('filters');
+        const totalDesignsEl = document.getElementById('totalDesigns'); const totalVotesEl = document.getElementById('totalVotes');
+        const heartSVG = `<svg class="vote-icon" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+        async function loadDesigns() {
+            try {
+                const [designsRes, statsRes] = await Promise.all([fetch('/api/designs'), fetch('/api/stats')]);
+                designs = await designsRes.json(); const stats = await statsRes.json();
+                totalDesignsEl.textContent = stats.totalDesigns.toLocaleString(); totalVotesEl.textContent = stats.totalVotes.toLocaleString();
+                const themes = [...new Set(designs.map(d => d.theme))].sort();
+                themes.forEach(theme => { const btn = document.createElement('button'); btn.className = 'filter-btn'; btn.dataset.filter = theme; btn.role = 'tab'; btn.textContent = designs.find(d => d.theme === theme)?.theme_cn || theme; filtersEl.appendChild(btn); });
+                filtersEl.addEventListener('click', e => { const btn = e.target.closest('.filter-btn'); if (!btn) return; document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); }); btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); currentFilter = btn.dataset.filter; renderGallery(); });
+                renderGallery();
+            } catch (err) { console.error(err); gallery.innerHTML = '<div class="empty-state">載入失敗，請重新整理</div>'; }
+        }
+        function renderGallery() {
+            const filtered = currentFilter === 'all' ? designs : designs.filter(d => d.theme === currentFilter);
+            if (filtered.length === 0) { gallery.innerHTML = '<div class="empty-state">此分類暂無設計</div>'; return; }
+            gallery.innerHTML = filtered.map(d => `
+                <article class="card" role="listitem" data-id="${d.id}">
+                    <img class="card-image" src="/images/${d.filename.replace('.png', '.webp')}" alt="${d.theme_cn} - ${d.style}${d.aspect ? ' (' + d.aspect + ')' : ''}" loading="lazy" onerror="this.src=this.src.replace('.webp', '.png')">
+                    <div class="card-content">
+                        <span class="card-theme">${d.theme_cn}</span>
+                        <h3 class="card-title">${d.style.replace(/([A-Z])/g, ' $1').trim()}</h3>
+                        <p class="card-style">${d.style}</p>
+                        ${d.aspect ? `<span class="card-aspect">${d.aspect}</span>` : ''}
+                        <button class="vote-btn ${votedDesigns.has(d.id) ? 'voted' : ''}" data-id="${d.id}" ${votedDesigns.has(d.id) ? 'disabled' : ''}>
+                            ${heartSVG} <span class="vote-count">${d.votes}</span>
+                        </button>
+                    </div>
+                </article>
+            `).join('');
+            gallery.querySelectorAll('.vote-btn:not(.voted)').forEach(btn => btn.addEventListener('click', handleVote));
+        }
+        async function handleVote(e) {
+            const btn = e.currentTarget; const id = btn.dataset.id; btn.disabled = true; btn.style.opacity = '0.7';
+            try { const res = await fetch(`/api/vote/${id}`, {method: 'POST'}); const data = await res.json(); if (data.success) { btn.classList.add('voted'); btn.querySelector('.vote-count').textContent = data.votes; votedDesigns.add(id); localStorage.setItem('moodhu_voted', JSON.stringify([...votedDesigns])); } else { alert(data.error || '投票失敗'); btn.disabled = false; btn.style.opacity = '1'; } } catch (err) { console.error(err); alert('網路錯誤'); btn.disabled = false; btn.style.opacity = '1'; } }
+        loadDesigns();
+    </script>
+</body>
+</html>
