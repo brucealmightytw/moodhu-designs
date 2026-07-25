@@ -63,8 +63,7 @@
 
   /* gallery */
   .gallery {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px; padding: 16px; max-width: 1400px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 16px;
   }
 
   .card {
@@ -209,7 +208,7 @@
   .empty-state .big-icon { font-size: 3rem; margin-bottom: 12px; }
 
   @media (max-width: 640px) {
-    .gallery { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; padding: 10px; }
+    .gallery { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; }
     header h1 { font-size: 1.2rem; }
     .stats-bar { gap: 12px; font-size: .7rem; }
     .card-body { padding: 8px 10px 10px; }
@@ -217,6 +216,9 @@
     .toolbar { top: 115px; }
     .card-img-wrap { aspect-ratio: 9 / 16; }
     .lightbox img { max-width: 96vw; max-height: 70vh; }
+  }
+  @media (max-width: 420px) {
+    .gallery { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 8px; }
   }
 </style>
 </head>
