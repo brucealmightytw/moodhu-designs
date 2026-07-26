@@ -1,659 +1,418 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moodhu Designs 投票</title>
-<style>
-:root {
-  --bg: #f5f5f7;
-  --white: #ffffff;
-  --black: #1d1d1f;
-  --gold: #c8a84e;
-  --goldLight: #f5ecc8;
-  --text: #1d1d1f;
-  --text2: #86868b;
-  --border: #d2d2d7;
-  --like: #34c759;
-  --dislike: #ff3b30;
-  --shadow: 0 2px 10px rgba(0,0,0,.04);
-  --shadow-hover: 0 8px 30px rgba(0,0,0,.08);
-  --radius: 12px;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
-  background: var(--bg); color: var(--text); min-height: 100vh;
-  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodhu Designs - Apple Style Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --apple-bg: #f5f5f7;
+      --apple-card: #ffffff;
+      --apple-text: #1d1d1f;
+      --apple-sub: #86868b;
+      --apple-blue: #0066cc;
+      --apple-gold: #c8a84e;
+      --apple-radius: 18px;
+      --apple-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --apple-shadow-hover: 0 20px 40px rgba(0,0,0,0.12);
+      --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
 
-/* Header — Apple style */
-header {
-  background: rgba(255,255,255,.85);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  padding: 16px 24px 12px; text-align: center;
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 0; z-index: 100;
-}
-header .logo-wrap {
-  max-width: 340px; margin: 0 auto 6px;
-}
-header .logo-wrap img { width: 100%; height: auto; display: block; }
-header .sub {
-  font-size: .75rem; color: var(--text2);
-  letter-spacing: .3px; font-weight: 400;
-}
-.stats-bar {
-  display: flex; justify-content: center; gap: 28px; margin-top: 6px;
-  font-size: .7rem; color: var(--text2); flex-wrap: wrap;
-  letter-spacing: .2px;
-}
-.stats-bar strong { color: var(--text); font-weight: 600; }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+    body { background-color: var(--apple-bg); font-family: var(--font-main); color: var(--apple-text); overflow-x: hidden; line-height: 1.47059; letter-spacing: -0.022em; }
 
-/* Toolbar */
-.toolbar {
-  background: rgba(255,255,255,.7);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 84px; z-index: 99;
-}
-.cat-bar {
-  display: flex; gap: 2px; padding: 8px 16px 4px; overflow-x: auto;
-  scrollbar-width: none; justify-content: center;
-}
-.cat-bar::-webkit-scrollbar { display: none; }
-.cat-btn {
-  flex-shrink: 0; padding: 5px 16px; border: none;
-  background: transparent; color: var(--text2); cursor: pointer;
-  font-size: .75rem; font-weight: 500;
-  transition: all .2s; white-space: nowrap;
-  border-radius: 20px;
-}
-.cat-btn:hover { color: var(--text); background: rgba(0,0,0,.04); }
-.cat-btn.active { background: var(--black); color: var(--white); }
-.cat-btn.top5 { color: var(--gold); }
-.cat-btn.top5:hover { background: rgba(200,168,78,.1); }
-.cat-btn.top5.active { background: var(--gold); color: var(--white); }
+    /* ════ 頂部導覽列 ════ */
+    header {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(245, 245, 247, 0.72);
+      backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      height: 48px; display: flex; align-items: center; justify-content: center;
+    }
+    .header-content { width: 100%; max-width: 1024px; padding: 0 22px; display: flex; justify-content: center; }
+    header .logo { height: 28px; transition: transform 0.2s ease; }
+    header .logo:hover { transform: scale(1.05); }
 
-.sort-bar {
-  display: flex; gap: 2px; padding: 2px 16px 8px; align-items: center;
-  justify-content: center;
-}
-.sort-bar label { color: var(--text2); font-size: .65rem; margin-right: 4px; font-weight: 500; }
-.sort-btn {
-  padding: 3px 12px; border: none; border-radius: 14px;
-  background: transparent; color: var(--text2); cursor: pointer;
-  font-size: .65rem; font-weight: 500; transition: all .2s;
-}
-.sort-btn:hover { background: rgba(0,0,0,.04); color: var(--text); }
-.sort-btn.active { background: rgba(200,168,78,.15); color: var(--gold); }
+    /* ════ 主要內容區 ════ */
+    main { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 22px; }
 
-/* Gallery */
-.gallery {
-  display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px;
-  padding: 24px; max-width: 1240px; margin: 0 auto;
-}
+    /* Apple Store 標題樣式 */
+    .store-hero { padding: 80px 0 40px; }
+    .store-hero h1 { font-size: 48px; font-weight: 600; color: var(--apple-text); }
+    .store-hero span { color: var(--apple-sub); }
 
-.card {
-  background: var(--white); overflow: hidden; transition: all .25s;
-  box-shadow: var(--shadow); cursor: pointer;
-  border-radius: var(--radius);
-}
-.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
-.card.top1 { box-shadow: 0 2px 16px rgba(200,168,78,.2); }
-.card.top2 { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-.card.top3 { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-.card.top4 { box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    /* ════ 分類滑動列 ════ */
+    .cat-scroller {
+      display: flex; gap: 20px; overflow-x: auto; padding: 20px 0;
+      scrollbar-width: none; -ms-overflow-style: none; margin: 0 -22px 30px; padding: 10px 22px;
+      white-space: nowrap; -webkit-overflow-scrolling: touch;
+    }
+    .cat-scroller::-webkit-scrollbar { display: none; }
+    .cat-item {
+      display: inline-flex; flex-direction: column; align-items: center; cursor: pointer;
+      min-width: 80px; transition: all 0.2s ease; flex-shrink: 0;
+    }
+    .cat-icon {
+      width: 64px; height: 64px; background: white; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 32px;
+      margin-bottom: 12px; transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 2px solid transparent;
+    }
+    .cat-name { font-size: 12px; font-weight: 500; color: var(--apple-text); text-align: center; }
+    .cat-item.active .cat-icon { border-color: var(--apple-gold); transform: scale(1.1); box-shadow: 0 4px 10px rgba(200, 168, 78, 0.2); }
+    .cat-item.active .cat-name { font-weight: 600; }
 
-.card-img-wrap {
-  width: 100%; aspect-ratio: 9 / 16; background: var(--bg); overflow: hidden;
-}
-.card-img-wrap img {
-  width: 100%; height: 100%; object-fit: cover;
-  transition: opacity .3s;
-}
-.card-img-wrap img.loading { opacity: 0; }
-.card-img-wrap img.loaded { opacity: 1; }
+    /* ════ 工具列 (排序/統計) ════ */
+    .toolbar { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
+    .stats-info { font-size: 14px; color: var(--apple-sub); }
+    .stats-info b { color: var(--apple-text); font-weight: 600; margin-left: 4px; }
+    .sort-group { display: flex; gap: 8px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 10px; }
+    .sort-btn {
+      padding: 6px 12px; font-size: 12px; border-radius: 7px; border: none; cursor: pointer;
+      background: transparent; color: var(--apple-sub); font-weight: 500; transition: all 0.2s;
+    }
+    .sort-btn.active { background: white; color: var(--apple-text); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-.card-body { padding: 10px 12px 12px; cursor: default; }
-.card-title {
-  font-size: .78rem; font-weight: 600; color: var(--text);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.card-cat {
-  font-size: .6rem; color: var(--gold); text-transform: uppercase;
-  letter-spacing: .8px; font-weight: 600; margin-bottom: 4px;
-}
-.card-rank {
-  display: inline-block; font-size: .55rem; font-weight: 700;
-  padding: 1px 8px; border-radius: 4px; letter-spacing: .3px;
-  margin-bottom: 4px;
-}
-.card-rank.t1 { background: var(--gold); color: var(--white); }
-.card-rank.t2 { background: #e8e8ed; color: var(--text); }
-.card-rank.t3 { background: #d4a574; color: var(--white); }
+    /* ════ 畫廊網格 ════ */
+    .gallery {
+      display: grid; gap: 24px; margin-bottom: 100px;
+      grid-template-columns: repeat(5, 1fr);
+    }
+    @media (max-width: 1024px) { .gallery { grid-template-columns: repeat(4, 1fr); } }
+    @media (max-width: 768px) { .gallery { grid-template-columns: repeat(3, 1fr); } .store-hero h1 { font-size: 32px; } }
+    @media (max-width: 480px) { .gallery { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
 
-.vote-row {
-  display: flex; align-items: center; gap: 4px; margin-top: 6px;
-}
-.vote-btn {
-  display: flex; align-items: center; gap: 3px;
-  padding: 4px 10px; border: 1px solid var(--border); border-radius: 8px;
-  background: transparent; color: var(--text2); cursor: pointer;
-  font-size: .7rem; font-weight: 500;
-  transition: all .2s;
-}
-.vote-btn:hover { border-color: var(--text); color: var(--text); }
-.vote-btn.like.active { background: rgba(52,199,89,.08); border-color: var(--like); color: #1b8a3d; }
-.vote-btn.dislike.active { background: rgba(255,59,48,.08); border-color: var(--dislike); color: #c41a1a; }
-.vote-btn .count { font-weight: 700; min-width: 14px; text-align: center; }
-.vote-btn .icon { font-size: .8rem; line-height: 1; }
-.vote-btn.loading { pointer-events: none; opacity: .4; }
+    /* ════ 作品卡片 ════ */
+    .card {
+      background: var(--apple-card); border-radius: var(--apple-radius);
+      overflow: hidden; box-shadow: var(--apple-shadow); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative; display: flex; flex-direction: column; cursor: pointer;
+    }
+    .card:hover { transform: scale(1.02); box-shadow: var(--apple-shadow-hover); }
 
-.del-btn {
-  margin-left: auto; padding: 4px 7px; border: 1px solid transparent; border-radius: 6px;
-  background: transparent; color: var(--text2); cursor: pointer;
-  font-size: .7rem; transition: all .2s;
-}
-.del-btn:hover { border-color: var(--dislike); color: var(--dislike); }
+    .card-img-box {
+      width: 100%; aspect-ratio: 9 / 16; overflow: hidden; background: #eee; position: relative;
+    }
+    .card-img-box img {
+      width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;
+    }
+    .card:hover img { transform: scale(1.05); }
 
-/* Lightbox — Apple style */
-.lightbox {
-  display: none; position: fixed; inset: 0; z-index: 998;
-  background: rgba(0,0,0,.9);
-  -webkit-backdrop-filter: blur(40px);
-  backdrop-filter: blur(40px);
-  align-items: center; justify-content: center;
-  flex-direction: column;
-}
-.lightbox.show { display: flex; }
-.lightbox-close {
-  position: absolute; top: 16px; right: 20px; z-index: 1;
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,.1); border: none;
-  color: #fff; font-size: 1.2rem; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .2s;
-}
-.lightbox-close:hover { background: rgba(255,255,255,.2); }
-.lightbox img {
-  max-width: 90vw; max-height: 78vh; object-fit: contain;
-  border-radius: 8px;
-}
-.lightbox-info {
-  text-align: center; margin-top: 14px; color: #a1a1a6;
-  font-size: .8rem;
-}
-.lightbox-info .title { color: #fff; font-weight: 600; font-size: .9rem; }
-.lightbox-info .cat { color: var(--gold); font-size: .65rem; letter-spacing: .8px; text-transform: uppercase; font-weight: 600; }
-.lightbox .vote-row { margin-top: 10px; justify-content: center; }
-.lightbox .vote-btn { font-size: .85rem; padding: 6px 16px; border-color: rgba(255,255,255,.2); color: #ccc; }
-.lightbox .vote-btn:hover { border-color: #fff; color: #fff; }
-.lightbox .vote-btn.like.active { background: rgba(52,199,89,.15); border-color: var(--like); color: var(--like); }
-.lightbox .vote-btn.dislike.active { background: rgba(255,59,48,.15); border-color: var(--dislike); color: var(--dislike); }
+    /* 排名標誌 */
+    .rank-badge {
+      position: absolute; top: 12px; left: 12px; padding: 4px 8px; border-radius: 6px;
+      font-size: 10px; font-weight: 700; color: white; text-transform: uppercase;
+      backdrop-filter: blur(8px); box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .rank-1 { background: linear-gradient(135deg, #FFD700, #DAA520); }
+    .rank-2 { background: linear-gradient(135deg, #C0C0C0, #808080); }
+    .rank-3 { background: linear-gradient(135deg, #CD7F32, #A0522D); }
 
-/* Admin Modal */
-.modal-overlay {
-  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  z-index: 999; align-items: center; justify-content: center;
-}
-.modal-overlay.show { display: flex; }
-.modal {
-  background: var(--white); border-radius: 16px; padding: 28px;
-  max-width: 340px; width: 90%; text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,.15);
-}
-.modal h3 { font-size: 1rem; font-weight: 600; color: var(--text); }
-.modal p { color: var(--text2); font-size: .75rem; margin: 6px 0 14px; }
-.modal input {
-  width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--bg); color: var(--text); font-size: .9rem;
-  text-align: center; outline: none; transition: border .2s;
-}
-.modal input:focus { border-color: var(--gold); }
-.modal .btn-row { display: flex; gap: 8px; margin-top: 16px; justify-content: center; }
-.modal .btn-row button {
-  padding: 8px 22px; border-radius: 10px; border: none;
-  cursor: pointer; font-size: .85rem; font-weight: 500;
-  transition: all .2s;
-}
-.modal .btn-confirm { background: var(--gold); color: var(--white); }
-.modal .btn-confirm:hover { opacity: .85; }
-.modal .btn-cancel { background: var(--bg); color: var(--text); }
-.modal .btn-cancel:hover { background: #e8e8ed; }
-.modal .error { color: var(--dislike); font-size: .8rem; margin-top: 8px; display: none; }
+    .card-body { padding: 16px; flex-grow: 1; display: flex; flex-direction: column; }
+    .card-cat { font-size: 10px; font-weight: 600; color: var(--apple-sub); text-transform: uppercase; margin-bottom: 4px; }
+    .card-title { font-size: 14px; font-weight: 600; color: var(--apple-text); margin-bottom: 12px; flex-grow: 1; }
 
-.toast {
-  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
-  background: var(--black); color: var(--white); padding: 10px 22px;
-  border-radius: 12px; font-size: .78rem; font-weight: 500; z-index: 1000;
-  opacity: 0; transition: opacity .25s; pointer-events: none;
-}
-.toast.show { opacity: 1; }
-.toast.success { }
-.toast.error { }
+    /* ════ 投票行 ════ */
+    .vote-row { display: flex; align-items: center; gap: 8px; }
+    .vote-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px;
+      padding: 8px 0; border-radius: 10px; border: none; cursor: pointer;
+      font-size: 12px; font-weight: 600; transition: all 0.2s; background: #f2f2f7; color: var(--apple-text);
+    }
+    .vote-btn .icon { font-size: 14px; }
+    .vote-btn.like.active { background: #34c759; color: white; }
+    .vote-btn.dislike.active { background: #ff3b30; color: white; }
+    .vote-btn:active { transform: scale(0.95); }
 
-.loading-gallery {
-  display: flex; align-items: center; justify-content: center;
-  min-height: 50vh; color: var(--text2); flex-direction: column; gap: 12px;
-  font-size: .85rem;
-}
-.spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+    .del-btn {
+      width: 32px; height: 32px; border-radius: 10px; border: none; background: #f2f2f7;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: all 0.2s;
+    }
+    .del-btn:hover { background: #ff3b30; color: white; }
 
-.empty-state { text-align: center; padding: 80px 20px; color: var(--text2); }
-.empty-state .big-icon { font-size: 2.5rem; margin-bottom: 10px; }
+    /* ════ 管理員彈窗 ════ */
+    .modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none;
+      align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(10px);
+    }
+    .modal.show { display: flex; }
+    .modal-content {
+      background: white; width: 90%; max-width: 320px; padding: 24px; border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;
+    }
+    .modal h2 { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+    .modal p { color: var(--apple-sub); font-size: 14px; margin-bottom: 20px; }
+    .modal input {
+      width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #d2d2d7;
+      background: #f5f5f7; font-size: 16px; text-align: center; margin-bottom: 16px; outline: none;
+    }
+    .modal-btns { display: flex; flex-direction: column; gap: 8px; }
+    .btn-confirm { background: var(--apple-text); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+    .btn-cancel { background: transparent; color: var(--apple-blue); border: none; padding: 8px; cursor: pointer; font-size: 14px; }
 
-/* Footer */
-footer {
-  text-align: center; padding: 24px 20px 30px;
-  color: var(--text2); font-size: .65rem;
-  border-top: 1px solid var(--border); margin-top: 40px;
-}
+    /* ════ Toast ════ */
+    .toast {
+      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 100px;
+      font-size: 14px; font-weight: 500; opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 3000; backdrop-filter: blur(10px);
+    }
+    .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
 
-@media (max-width: 1024px) {
-  .gallery { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 16px; }
-}
-@media (max-width: 768px) {
-  .gallery { grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 12px; }
-  header { position: relative; top: 0; }
-  .toolbar { position: relative; top: 0; }
-  header .logo-wrap { max-width: 260px; }
-  .stats-bar { gap: 16px; font-size: .65rem; }
-  .cat-bar { justify-content: flex-start; }
-  .sort-bar { justify-content: flex-start; }
-  .card-body { padding: 8px 10px 10px; }
-  .vote-btn { padding: 3px 8px; font-size: .65rem; }
-}
-@media (max-width: 480px) {
-  .gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 10px; }
-}
-</style>
+    /* 頁尾 */
+    footer { padding: 60px 0; border-top: 1px solid #d2d2d7; font-size: 12px; color: var(--apple-sub); text-align: center; }
+  </style>
 </head>
 <body>
 
-<header>
-  <div class="logo-wrap"><img src="logo.png" alt="Moodhu Designs"></div>
-  <div class="sub">票選你最喜歡的海洋設計作品</div>
-  <div class="stats-bar">
-    <span>總投票 <strong id="totalVotes">0</strong></span>
-    <span>👑 冠軍 <strong id="topDesign">-</strong></span>
-    <span>投票人數 <strong id="voterCount">0</strong></span>
-  </div>
-</header>
+  <header>
+    <div class="header-content">
+      <img src="/logo.png" alt="Moodhu Logo" class="logo">
+    </div>
+  </header>
 
-<div class="toolbar">
-  <div class="cat-bar" id="catBar">
-    <button class="cat-btn active" data-cat="all">全部</button>
-    <button class="cat-btn top5" data-cat="__top5__">🏆 Top 5</button>
-  </div>
-  <div class="sort-bar" id="sortBar">
-    <label>排序</label>
-    <button class="sort-btn active" data-sort="votes">最多票</button>
-    <button class="sort-btn" data-sort="likes">最多讚</button>
-    <button class="sort-btn" data-sort="score">最高分</button>
-    <button class="sort-btn" data-sort="default">預設</button>
-  </div>
-</div>
+  <main>
+    <section class="store-hero">
+      <h1>作品集投票<span>。選出你最愛的設計。</span></h1>
+    </section>
 
-<div id="gallery" class="gallery">
-  <div class="loading-gallery"><div class="spinner"></div></div>
-</div>
+    <!-- 分類滑動列 -->
+    <div class="cat-scroller" id="catScroller">
+      <div class="cat-item active" onclick="filterCat('all', this)">
+        <div class="cat-icon">🏠</div>
+        <div class="cat-name">全部</div>
+      </div>
+      <div class="cat-item" onclick="filterCat('WhaleShark', this)">
+        <div class="cat-icon">🐋</div>
+        <div class="cat-name">鯨鯊</div>
+      </div>
+      <div class="cat-item" onclick="filterCat('MantaRay', this)">
+        <div class="cat-icon">🪁</div>
+        <div class="cat-name">魟魚</div>
+      </div>
+      <div class="cat-item" onclick="filterCat('SeaTurtle', this)">
+        <div class="cat-icon">🐢</div>
+        <div class="cat-name">海龜</div>
+      </div>
+      <div class="cat-item" onclick="filterCat('Dolphin', this)">
+        <div class="cat-icon">🐬</div>
+        <div class="cat-name">海豚</div>
+      </div>
+      <div class="cat-item" onclick="filterCat('TropicalFish', this)">
+        <div class="cat-icon">🐠</div>
+        <div class="cat-name">熱帶魚</div>
+      </div>
+      <div class="cat-item" onclick="filterCat('Mixed', this)">
+        <div class="cat-icon">🎨</div>
+        <div class="cat-name">綜合</div>
+      </div>
+    </div>
 
-<div class="empty-state" id="emptyState" style="display:none;">
-  <div class="big-icon">🏝️</div>
-  <p>這個分類還沒有作品</p>
-</div>
+    <div class="toolbar">
+      <div class="stats-info">
+        共 <b id="totalDesigns">-</b> 件作品 &middot; <b id="totalVotes">-</b> 次投票
+      </div>
+      <div class="sort-group">
+        <button class="sort-btn active" onclick="setSort('votes', this)">熱門</button>
+        <button class="sort-btn" onclick="setSort('likes', this)">最多讚</button>
+        <button class="sort-btn" onclick="setSort('default', this)">最新</button>
+      </div>
+    </div>
 
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img id="lbImg" src="" alt="">
-  <div class="lightbox-info">
-    <div class="title" id="lbTitle"></div>
-    <div class="cat" id="lbCat"></div>
-    <div class="vote-row" id="lbVoteRow"></div>
-  </div>
-</div>
+    <div class="gallery" id="gallery">
+      <!-- 作品卡片將由 JS 產生 -->
+    </div>
 
-<!-- Admin Modal -->
-<div class="modal-overlay" id="adminModal">
-  <div class="modal">
-    <h3>🔑 管理員驗證</h3>
-    <p>輸入密碼以刪除作品</p>
-    <input type="password" id="pwdInput" placeholder="請輸入管理密碼" autocomplete="off">
-    <div class="error" id="pwdError">密碼錯誤</div>
-    <div class="btn-row">
-      <button class="btn-cancel" onclick="closeAdminModal()">取消</button>
-      <button class="btn-confirm" id="pwdConfirm">確認刪除</button>
+    <footer>
+      Copyright &copy; 2024 Moodhu Designs. Inspired by Apple Store.
+    </footer>
+  </main>
+
+  <!-- 管理員 Modal -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <h2>管理員驗證</h2>
+      <p>請輸入密碼以永久刪除此作品</p>
+      <input type="password" id="pwdInput" placeholder="密碼">
+      <div id="pwdError" style="color:#ff3b30; font-size:12px; margin-top:-10px; margin-bottom:10px; display:none;">密碼錯誤</div>
+      <div class="modal-btns">
+        <button id="pwdConfirm" class="btn-confirm">確認刪除</button>
+        <button onclick="closeAdminModal()" class="btn-cancel">取消</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="toast" id="toast"></div>
+  <div id="toast" class="toast"></div>
 
-<footer>
-  Inspired by the Maldives ocean &middot; Moodhu Designs
-</footer>
+  <script>
+    const API_BASE = window.location.origin;
+    const ADMIN_PASSWORD = 'moodhu2024';
 
-<script>
-// ════ 設定
-const API_BASE = (() => {
-  const loc = window.location;
-  if (loc.hostname === 'localhost' || loc.hostname === '127.0.0.1')
-    return `http://${loc.hostname}:8000`;
-  return loc.origin;
-})();
-const ADMIN_PASSWORD = 'moodhu2024';
-
-// ════ 投票者識別
-function getVoterId() {
-  let vid = localStorage.getItem('moodhu_voter_id');
-  if (!vid) {
-    const fp = [
-      navigator.userAgent, screen.width, screen.height, screen.colorDepth,
-      navigator.language, Intl.DateTimeFormat().resolvedOptions().timeZone
-    ].join('||');
-    let hash = 0;
-    for (let i = 0; i < fp.length; i++) { hash = ((hash << 5) - hash) + fp.charCodeAt(i); hash |= 0; }
-    vid = 'v_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
-    localStorage.setItem('moodhu_voter_id', vid);
-  }
-  return vid;
-}
-const VOTER_ID = getVoterId();
-
-// ════ 全域
-let designs = [];
-let userVotes = {};
-let currentCat = 'all';
-let currentSort = 'votes';
-let deleteTarget = null;
-
-// ════ API
-async function apiGet(path) {
-  const r = await fetch(`${API_BASE}${path}`);
-  if (!r.ok) throw new Error(await r.text());
-  return r.json();
-}
-async function apiPost(path, body) {
-  const r = await fetch(`${API_BASE}${path}`, {
-    method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body)
-  });
-  if (!r.ok) throw new Error(await r.text());
-  return r.json();
-}
-
-// ════ Toast
-function showToast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast ' + type;
-  t.classList.add('show');
-  clearTimeout(t._hide);
-  t._hide = setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ════ 管理員 Modal
-function openAdminModal(designId) {
-  deleteTarget = designId;
-  document.getElementById('pwdInput').value = '';
-  document.getElementById('pwdError').style.display = 'none';
-  document.getElementById('adminModal').classList.add('show');
-  setTimeout(() => document.getElementById('pwdInput').focus(), 100);
-}
-function closeAdminModal() {
-  document.getElementById('adminModal').classList.remove('show');
-  deleteTarget = null;
-}
-document.getElementById('pwdConfirm').onclick = async function() {
-  const pwd = document.getElementById('pwdInput').value;
-  if (pwd === ADMIN_PASSWORD) {
-    const target = deleteTarget;
-    closeAdminModal();
-    if (target) doDelete(target);
-    showToast('✅ 管理員驗證成功', 'success');
-  } else {
-    document.getElementById('pwdError').style.display = 'block';
-  }
-};
-document.getElementById('pwdInput').onkeydown = e => {
-  if (e.key === 'Enter') document.getElementById('pwdConfirm').click();
-};
-document.getElementById('adminModal').onclick = function(e) {
-  if (e.target === this) closeAdminModal();
-};
-
-// ════ Lightbox
-let lbDesignId = null;
-function openLightbox(designId) {
-  lbDesignId = designId;
-  const d = designs.find(x => x.id === designId);
-  if (!d) return;
-  document.getElementById('lbImg').src = `images/${d.filename}`;
-  document.getElementById('lbTitle').textContent = d.title;
-  document.getElementById('lbCat').textContent = d.category;
-
-  const vb = document.getElementById('lbVoteRow');
-  const vc = window._lastVoteCounts?.[designId] || { likes: 0, dislikes: 0 };
-  const my = userVotes[designId];
-  vb.innerHTML = `
-    <button class="vote-btn like ${my === 'like' ? 'active' : ''}" onclick="castVote('${designId}','like');event.stopPropagation()">
-      <span class="icon">👍</span> <span class="count">${vc.likes}</span>
-    </button>
-    <button class="vote-btn dislike ${my === 'dislike' ? 'active' : ''}" onclick="castVote('${designId}','dislike');event.stopPropagation()">
-      <span class="icon">👎</span> <span class="count">${vc.dislikes}</span>
-    </button>`;
-
-  document.getElementById('lightbox').classList.add('show');
-  document.body.style.overflow = 'hidden';
-}
-function closeLightbox(e) {
-  if (e && e.target !== e.currentTarget) return;
-  document.getElementById('lightbox').classList.remove('show');
-  document.body.style.overflow = '';
-  lbDesignId = null;
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeLightbox();
-});
-
-// ════ 核心功能
-async function castVote(designId, voteType) {
-  const btn = event?.currentTarget;
-  if (btn) btn.classList.add('loading');
-  try {
-    const result = await apiPost(`/api/vote?voter_id=${encodeURIComponent(VOTER_ID)}`, {
-      design_id: designId, vote_type: voteType
-    });
-    userVotes = result.my || {};
-    await renderGallery();
-    await updateStats();
-    if (lbDesignId === designId) {
-      const vc = (result.votes || {})[designId] || { likes: 0, dislikes: 0 };
-      const my = userVotes[designId];
-      const vb = document.getElementById('lbVoteRow');
-      vb.innerHTML = `
-        <button class="vote-btn like ${my === 'like' ? 'active' : ''}" onclick="castVote('${designId}','like');event.stopPropagation()">
-          <span class="icon">👍</span> <span class="count">${vc.likes}</span>
-        </button>
-        <button class="vote-btn dislike ${my === 'dislike' ? 'active' : ''}" onclick="castVote('${designId}','dislike');event.stopPropagation()">
-          <span class="icon">👎</span> <span class="count">${vc.dislikes}</span>
-        </button>`;
+    function getVoterId() {
+      let vid = localStorage.getItem('moodhu_voter_id');
+      if (!vid) {
+        vid = 'v_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('moodhu_voter_id', vid);
+      }
+      return vid;
     }
-    const msg = result.action === 'removed' ? '✅ 已取消投票' : '✅ 投票成功！';
-    showToast(msg, 'success');
-  } catch(e) {
-    showToast('⚠️ 投票失敗', 'error');
-  } finally {
-    if (btn) btn.classList.remove('loading');
-  }
-}
+    const VOTER_ID = getVoterId();
 
-async function doDelete(designId) {
-  try {
-    await apiPost('/api/delete', { design_id: designId, password: ADMIN_PASSWORD });
-    const data = await apiGet('/api/designs');
-    designs = data.designs || [];
-    showToast('🗑️ 已刪除作品', 'success');
-    await renderGallery();
-    await updateStats();
-  } catch(e) {
-    showToast('⚠️ 刪除失敗: ' + e.message, 'error');
-  }
-}
+    let designs = [];
+    let userVotes = {};
+    let currentCat = 'all';
+    let currentSort = 'votes';
+    let deleteTarget = null;
 
-async function renderGallery() {
-  const container = document.getElementById('gallery');
-  const empty = document.getElementById('emptyState');
+    async function init() {
+      await loadData();
+      await renderGallery();
+    }
 
-  let voteCounts = {}, myVotes = {};
-  try {
-    [voteCounts, myVotes] = await Promise.all([
-      apiGet('/api/votes'),
-      apiGet(`/api/votes/me?voter_id=${encodeURIComponent(VOTER_ID)}`)
-    ]);
-  } catch(e) {}
-  userVotes = myVotes;
-  window._lastVoteCounts = voteCounts;
+    async function loadData() {
+      try {
+        const dRes = await fetch(`${API_BASE}/api/designs`);
+        const dData = await dRes.json();
+        designs = dData.designs;
+        document.getElementById('totalDesigns').textContent = designs.length;
 
-  let filtered = [...designs];
-  if (currentCat === '__top5__') {
-    filtered.sort((a, b) => {
-      const sa = (voteCounts[a.id]?.likes || 0) - (voteCounts[a.id]?.dislikes || 0);
-      const sb = (voteCounts[b.id]?.likes || 0) - (voteCounts[b.id]?.dislikes || 0);
-      return sb - sa;
-    });
-    filtered = filtered.slice(0, 5);
-  } else if (currentCat !== 'all') {
-    filtered = designs.filter(d => d.category === currentCat);
-  }
+        const vRes = await fetch(`${API_BASE}/api/votes/me?voter_id=${VOTER_ID}`);
+        userVotes = await vRes.json();
 
-  // 排序
-  filtered.sort((a, b) => {
-    const va = voteCounts[a.id] || { likes: 0, dislikes: 0 };
-    const vb = voteCounts[b.id] || { likes: 0, dislikes: 0 };
-    const ta = va.likes + va.dislikes;
-    const tb = vb.likes + vb.dislikes;
-    const sa = va.likes - va.dislikes;
-    const sb = vb.likes - vb.dislikes;
-    if (currentSort === 'likes') return (vb.likes || 0) - (va.likes || 0);
-    if (currentSort === 'score') return sb - sa;
-    if (currentSort === 'votes') return tb - ta;
-    return 0;
-  });
+        const sRes = await fetch(`${API_BASE}/api/stats`);
+        const sData = await sRes.json();
+        document.getElementById('totalVotes').textContent = sData.total_votes;
+      } catch(e) { console.error(e); }
+    }
 
-  if (filtered.length === 0) {
-    container.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
+    function filterCat(cat, el) {
+      currentCat = cat;
+      document.querySelectorAll('.cat-item').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      renderGallery();
+    }
 
-  let html = '';
-  filtered.forEach((d, i) => {
-    const vc = voteCounts[d.id] || { likes: 0, dislikes: 0 };
-    const my = myVotes[d.id];
-    const isTop5 = currentCat === '__top5__';
-    const rank = i + 1;
-    const topClass = !isTop5 && rank <= 4 ? ` top${rank}` : '';
-    const rankLabel = rank <= 3 ? ['🥇','🥈','🥉'][rank-1] : '';
+    function setSort(sort, el) {
+      currentSort = sort;
+      document.querySelectorAll('.sort-btn').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      renderGallery();
+    }
 
-    html += `
-      <div class="card${topClass}" data-id="${d.id}">
-        <div class="card-img-wrap" onclick="openLightbox('${d.id}')">
-          <img class="loading" loading="lazy" src="images/${d.filename}"
-               alt="${d.title}"
-               onload="this.classList.remove('loading');this.classList.add('loaded')"
-               onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;color:#86868b;font-size:2rem\\'>❌</div>'">
-        </div>
-        <div class="card-body">
-          <div class="card-cat">${d.category}</div>
-          <div class="card-title" title="${d.title}">${rankLabel ? '<span class="card-rank t' + rank + '">' + rankLabel + '</span> ' : ''}${d.title}</div>
-          <div class="vote-row">
-            <button class="vote-btn like ${my === 'like' ? 'active' : ''}" onclick="event.stopPropagation();castVote('${d.id}','like')">
-              <span class="icon">👍</span> <span class="count">${vc.likes || 0}</span>
-            </button>
-            <button class="vote-btn dislike ${my === 'dislike' ? 'active' : ''}" onclick="event.stopPropagation();castVote('${d.id}','dislike')">
-              <span class="icon">👎</span> <span class="count">${vc.dislikes || 0}</span>
-            </button>
-            <button class="del-btn" onclick="event.stopPropagation();openAdminModal('${d.id}')" title="刪除">🗑️</button>
+    async function renderGallery() {
+      const container = document.getElementById('gallery');
+      const vRes = await fetch(`${API_BASE}/api/votes`);
+      const counts = await vRes.json();
+
+      let filtered = designs.filter(d => currentCat === 'all' || d.category === currentCat);
+
+      // 排序
+      if (currentSort === 'votes') {
+        filtered.sort((a,b) => {
+          const vA = (counts[a.id]?.likes || 0) + (counts[a.id]?.dislikes || 0);
+          const vB = (counts[b.id]?.likes || 0) + (counts[b.id]?.dislikes || 0);
+          return vB - vA;
+        });
+      } else if (currentSort === 'likes') {
+        filtered.sort((a,b) => (counts[b.id]?.likes || 0) - (counts[a.id]?.likes || 0));
+      }
+
+      container.innerHTML = filtered.map((d, index) => {
+        const vc = counts[d.id] || {likes:0, dislikes:0};
+        const my = userVotes[d.id];
+        
+        let rankBadge = '';
+        if (currentSort === 'votes' || currentSort === 'likes') {
+          if (index === 0) rankBadge = '<div class="rank-badge rank-1">🏆 NO.1</div>';
+          else if (index === 1) rankBadge = '<div class="rank-badge rank-2">🥈 NO.2</div>';
+          else if (index === 2) rankBadge = '<div class="rank-badge rank-3">🥉 NO.3</div>';
+        }
+
+        return `
+          <div class="card" onclick="window.open('images/${d.filename}', '_blank')">
+            <div class="card-img-box">
+              <img src="images/${d.filename}" loading="lazy">
+              ${rankBadge}
+            </div>
+            <div class="card-body">
+              <div class="card-cat">${d.category}</div>
+              <div class="card-title">${d.title}</div>
+              <div class="vote-row" onclick="event.stopPropagation()">
+                <button class="vote-btn like ${my === 'like' ? 'active' : ''}" onclick="castVote('${d.id}','like')">
+                  <span class="icon">👍</span> <span>${vc.likes}</span>
+                </button>
+                <button class="vote-btn dislike ${my === 'dislike' ? 'active' : ''}" onclick="castVote('${d.id}','dislike')">
+                  <span class="icon">👎</span> <span>${vc.dislikes}</span>
+                </button>
+                <button class="del-btn" onclick="openAdminModal('${d.id}')">🗑️</button>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>`;
-  });
-
-  container.innerHTML = html;
-}
-
-async function updateStats() {
-  try {
-    const stats = await apiGet('/api/stats');
-    document.getElementById('totalVotes').textContent = stats.total_votes || 0;
-    document.getElementById('voterCount').textContent = stats.voter_count || 0;
-    document.getElementById('topDesign').textContent = stats.top_design || '-';
-  } catch(e) {}
-}
-
-function buildCats() {
-  const cats = [...new Set(designs.map(d => d.category))].sort();
-  const bar = document.getElementById('catBar');
-  cats.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'cat-btn'; btn.dataset.cat = c;
-    btn.textContent = c; bar.appendChild(btn);
-  });
-}
-
-// ════ 事件繫結
-document.getElementById('catBar').addEventListener('click', e => {
-  const btn = e.target.closest('.cat-btn');
-  if (!btn) return;
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentCat = btn.dataset.cat;
-  renderGallery();
-});
-
-document.getElementById('sortBar').addEventListener('click', e => {
-  const btn = e.target.closest('.sort-btn');
-  if (!btn) return;
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  currentSort = btn.dataset.sort;
-  renderGallery();
-});
-
-// ════ 啟動
-async function init() {
-  try {
-    let data;
-    try {
-      data = await apiGet('/api/designs');
-      designs = data.designs || [];
-    } catch(e) {
-      const resp = await fetch('designs.json');
-      const j = await resp.json();
-      designs = j.designs;
+        `;
+      }).join('');
     }
-    buildCats();
-    await renderGallery();
-    await updateStats();
-    setInterval(updateStats, 30000);
-  } catch(e) {
-    document.getElementById('gallery').innerHTML = `
-      <div class="empty-state">
-        <div class="big-icon">⚠️</div>
-        <p>載入失敗：${e.message}</p>
-        <p style="font-size:.75rem;color:var(--text2);margin-top:8px;">請確認後端伺服器是否正常運行</p>
-      </div>`;
-  }
-}
 
-init();
-</script>
+    async function castVote(did, type) {
+      try {
+        const r = await fetch(`${API_BASE}/api/vote?voter_id=${VOTER_ID}`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({design_id: did, vote_type: type})
+        });
+        const res = await r.json();
+        userVotes = res.my;
+        showToast(res.action === 'added' ? '✅ 感謝投票' : '✅ 已更新投票');
+        renderGallery();
+        document.getElementById('totalVotes').textContent = Object.values(res.votes).reduce((a,b) => a + b.likes + b.dislikes, 0);
+      } catch(e) { showToast('❌ 投票失敗'); }
+    }
+
+    function openAdminModal(did) {
+      deleteTarget = did;
+      document.getElementById('pwdInput').value = '';
+      document.getElementById('pwdError').style.display = 'none';
+      document.getElementById('adminModal').classList.add('show');
+    }
+    function closeAdminModal() { document.getElementById('adminModal').classList.remove('show'); }
+
+    document.getElementById('pwdConfirm').onclick = async () => {
+      const pwd = document.getElementById('pwdInput').value;
+      if (pwd !== ADMIN_PASSWORD) {
+        document.getElementById('pwdError').style.display = 'block';
+        return;
+      }
+      try {
+        const r = await fetch(`${API_BASE}/api/delete`, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({design_id: deleteTarget, password: pwd})
+        });
+        const res = await r.json();
+        if (r.ok && res.ok) {
+          showToast('🗑️ 作品已永久刪除');
+          closeAdminModal();
+          await init();
+        } else {
+          showToast('❌ 刪除失敗: ' + (res.detail || res.message || '未知錯誤'));
+        }
+      } catch(e) { 
+        showToast('❌ 伺服器錯誤');
+        console.error(e);
+      }
+    };
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    init();
+  </script>
 </body>
 </html>
