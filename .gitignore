@@ -1,5 +1,7 @@
-__pycache__/
-*.pyc
-data/
+node_modules
+.env
+*.log
+votes.db
 .DS_Store
-Thumbs.db
+public/images/*.webp
+!public/images/.gitkeep
