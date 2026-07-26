@@ -3,5 +3,6 @@ node_modules
 *.log
 votes.db
 .DS_Store
+data/
 public/images/*.webp
 !public/images/.gitkeep
