@@ -528,15 +528,21 @@ const VOTER_ID = getVoterId();
 // Init
 async function init() {
   try {
-    const [designData, voteData] = await Promise.all([
-      fetch(`${API_BASE}/api/designs`).then(r => r.json()),
-      fetch(`${API_BASE}/api/votes?voter_id=${VOTER_ID}`).then(r => r.json())
-    ]);
+    const designData = await fetch(`${API_BASE}/api/designs`).then(r => r.json());
     designs = designData.designs || [];
-    votes = voteData.votes || {};
+    
+    // Get user votes
+    try {
+      const voteData = await fetch(`${API_BASE}/api/votes?voter_id=${VOTER_ID}`).then(r => r.json());
+      votes = voteData.votes || voteData || {};
+    } catch(e) {
+      votes = {};
+    }
+    
     renderCategories();
     renderGallery();
   } catch(e) {
+    console.error('Init error:', e);
     showToast('❌ 無法載入作品');
     console.error(e);
   }
