@@ -8,3 +8,10 @@ public/images/*.webp
 !public/images/.gitkeep
 
 brand-colors.jpg
+
+designs.json
+catalog.html
+catalog.json
+public/
+deleted_ids.json
+brand-colors.jpg

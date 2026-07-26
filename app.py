@@ -15,6 +15,7 @@ DATA_DIR = Path("data")
 DATA_DIR.mkdir(exist_ok=True)
 VOTES_FILE = DATA_DIR / "votes.json"
 DESIGNS_FILE = DATA_DIR / "designs.json"
+DELETED_IDS_FILE = Path("deleted_ids.json")  # 永久刪除記錄（跨重啟保留）
 
 def load_json(path):
     if path.exists():
@@ -24,21 +25,41 @@ def load_json(path):
 def save_json(path, data):
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
+def load_deleted_ids():
+    """載入永久刪除的 ID 清單"""
+    if DELETED_IDS_FILE.exists():
+        return set(json.loads(DELETED_IDS_FILE.read_text(encoding="utf-8")))
+    return set()
+
+def save_deleted_ids(ids):
+    DELETED_IDS_FILE.write_text(
+        json.dumps(sorted(list(ids)), ensure_ascii=False), encoding="utf-8"
+    )
+
 def init_db():
-    """初始化 votes 和 designs 資料"""
-    # 載入 designs 從 designs.json (壓縮時產生的)
+    """初始化資料庫（僅首次建立，不覆蓋）"""
+    deleted_ids = load_deleted_ids()
+
+    # 只有當 data/designs.json 不存在時才從根源目錄建立
     src = Path("designs.json")
-    if src.exists():
+    if not DESIGNS_FILE.exists() and src.exists():
         data = json.loads(src.read_text(encoding="utf-8"))
-        save_json(DESIGNS_FILE, {d["id"]: {**d, "deleted": False} for d in data["designs"]})
-    
-    # 初始化 votes
+        designs = {}
+        for d in data["designs"]:
+            # 跳過：參考圖、已永久刪除的
+            if d["id"] in deleted_ids:
+                continue
+            if d.get("category", "").startswith("_reference"):
+                continue
+            designs[d["id"]] = d
+        save_json(DESIGNS_FILE, designs)
+
     if not VOTES_FILE.exists():
         save_json(VOTES_FILE, {})
 
 def get_designs():
     db = load_json(DESIGNS_FILE)
-    return [d for d in db.values() if not d.get("deleted")]
+    return list(db.values())
 
 def get_votes_count():
     """回傳 { design_id: {likes: N, dislikes: N} }"""
@@ -129,7 +150,6 @@ def api_vote(req: VoteRequest, voter_id: str = ""):
         action = "added"
     
     save_json(VOTES_FILE, votes_db)
-    
     return {"action": action, "votes": get_votes_count(), "my": get_voter_votes(vid)}
 
 @app.post("/api/delete")
@@ -141,9 +161,29 @@ def api_delete(req: DeleteRequest):
     if req.design_id not in db:
         raise HTTPException(404, "找不到此設計")
     
-    db[req.design_id]["deleted"] = True
+    # ① 從資料庫完全移除
+    del db[req.design_id]
     save_json(DESIGNS_FILE, db)
-    return {"ok": True, "message": "已刪除"}
+    
+    # ② 記錄到永久刪除清單（跨重啟、跨機器都有效）
+    deleted_ids = load_deleted_ids()
+    deleted_ids.add(req.design_id)
+    save_deleted_ids(deleted_ids)
+    
+    # ③ 清理該設計的所有投票資料
+    votes_db = load_json(VOTES_FILE)
+    changed = False
+    for vid in list(votes_db.keys()):
+        before = len(votes_db[vid])
+        votes_db[vid] = [v for v in votes_db[vid] if v["design_id"] != req.design_id]
+        if len(votes_db[vid]) != before:
+            changed = True
+        if not votes_db[vid]:
+            del votes_db[vid]
+    if changed:
+        save_json(VOTES_FILE, votes_db)
+    
+    return {"ok": True, "message": "已永久刪除"}
 
 @app.get("/api/stats")
 def api_stats():
