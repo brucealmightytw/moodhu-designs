@@ -4,7 +4,5 @@ node_modules
 votes.db
 .DS_Store
 data/
-public/images/*.webp
-!public/images/.gitkeep
+public/
 brand-colors.jpg
-deleted_ids.json
