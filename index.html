@@ -528,14 +528,28 @@ const VOTER_ID = getVoterId();
 // Init
 async function init() {
   try {
+    // 1. 載入作品列表
     const designData = await fetch(`${API_BASE}/api/designs`).then(r => r.json());
     designs = designData.designs || [];
     
-    // Get user votes
+    // 2. 載入全局投票統計
     try {
-      const voteData = await fetch(`${API_BASE}/api/votes?voter_id=${VOTER_ID}`).then(r => r.json());
-      votes = voteData.votes || voteData || {};
+      const voteCounts = await fetch(`${API_BASE}/api/votes`).then(r => r.json());
+      // 將投票數加到每個作品上
+      designs.forEach(d => {
+        d.votes = voteCounts[d.id] || {likes: 0, dislikes: 0};
+        d.votes.net = d.votes.likes - d.votes.dislikes;
+      });
     } catch(e) {
+      console.error('Failed to load vote counts:', e);
+      designs.forEach(d => d.votes = {likes: 0, dislikes: 0, net: 0});
+    }
+    
+    // 3. 載入個人投票記錄
+    try {
+      votes = await fetch(`${API_BASE}/api/votes/me?voter_id=${VOTER_ID}`).then(r => r.json());
+    } catch(e) {
+      console.error('Failed to load user votes:', e);
       votes = {};
     }
     
@@ -544,7 +558,6 @@ async function init() {
   } catch(e) {
     console.error('Init error:', e);
     showToast('❌ 無法載入作品');
-    console.error(e);
   }
 }
 
