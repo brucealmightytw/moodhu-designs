@@ -426,14 +426,30 @@ header {
 }
 
 @media (max-width: 768px) {
-  .hero h1 { font-size: 40px; }
-  .hero p { font-size: 17px; }
+  .header-inner { padding: 12px 16px; }
+  .header-title { font-size: 19px; }
+  .hero { padding: 40px 16px 20px; }
+  .hero h1 { font-size: 34px; }
+  .hero p { font-size: 16px; }
+  .toolbar { padding: 0 16px; margin-bottom: 24px; }
   .gallery {
+    padding: 0 16px 60px;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 16px;
   }
+  .card-body { padding: 12px; }
+  .card-title { font-size: 15px; margin-bottom: 8px; }
+  .vote-btn { padding: 6px; font-size: 13px; }
 }
-</style>
+
+@media (max-width: 480px) {
+  .gallery {
+    grid-template-columns: 1fr 1fr; /* 強制兩欄，避免單欄太大 */
+    gap: 12px;
+  }
+  .hero h1 { font-size: 28px; }
+  .card-title { font-size: 14px; }
+}
 </head>
 <body>
 

@@ -85,7 +85,10 @@ async def lifespan(app: FastAPI):
     init_db()
     yield
 
+from fastapi.middleware.gzip import GZipMiddleware
+
 app = FastAPI(title="Moodhu Designs API", lifespan=lifespan)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # ── API Models ──
 class VoteRequest(BaseModel):
