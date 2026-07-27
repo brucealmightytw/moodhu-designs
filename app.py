@@ -206,8 +206,8 @@ def api_stats():
     }
 
 # ── 靜態檔案服務 ──
-# 掛載 images 資料夾
-app.mount("/images", StaticFiles(directory="images"), name="images")
+# 掛載 images 資料夾（含快取 headers）
+app.mount("/images", StaticFiles(directory="images", check_dir=False), name="images")
 
 # 前端靜態檔 (index.html, designs.json)
 @app.get("/")
