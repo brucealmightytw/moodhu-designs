@@ -6,115 +6,770 @@
 <title>Moodhu Designs — Ocean Art Gallery</title>
 <link rel="preload" as="image" href="logo.png">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a0a0a;--surface:#161617;--surface2:#1d1d1f;--text:#f5f5f7;--text2:#86868b;--text3:#555;--gold:#d4af37;--gold-dim:#a8882e;--radius:14px;--gap:16px;--w:1280px}
-html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
-body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-a{color:var(--gold);text-decoration:none}
+/* ═══ BASE STYLES ═══ */
+:root {
+  --bg: #0a0a0a;
+  --surface: #161617;
+  --surface2: #1d1d1f;
+  --text: #f5f5f7;
+  --text2: #86868b;
+  --text3: #555;
+  --gold: #d4af37;
+  --gold-dim: #a8882e;
+  --radius: 12px;
+  --gap: 16px;
+  --w: 1280px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--gold);
+  text-decoration: none;
+}
 
 /* ═══ HEADER ═══ */
-header{position:sticky;top:0;z-index:100;background:rgba(26,26,28,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(255,255,255,.06)}
-.h-inner{max-width:var(--w);margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:12px}
-.logo{height:32px;width:auto;filter:drop-shadow(0 0 6px rgba(212,175,55,.2))}
-.h-right{margin-left:auto;display:flex;align-items:center;gap:16px;font-size:13px;color:var(--text3)}
-.h-stats{color:var(--text2)}.h-stats b{color:var(--text);font-weight:500}
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(26, 26, 28, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.h-inner {
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  height: 32px;
+  width: auto;
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.2));
+}
+
+.h-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+.h-stats {
+  color: var(--text2);
+}
+
+.h-stats b {
+  color: var(--text);
+  font-weight: 500;
+}
 
 /* ═══ HERO ═══ */
-.hero{max-width:var(--w);margin:0 auto;padding:64px 24px 32px}
-.hero h1{font-size:52px;font-weight:700;letter-spacing:-.025em;line-height:1.08;background:linear-gradient(135deg,#f5f5f7 30%,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:19px;color:var(--text2);margin-top:10px;font-weight:400}
+.hero {
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 40px 24px 20px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.015em;
+  margin-bottom: 8px;
+}
+
+.hero p {
+  font-size: 21px;
+  color: var(--text2);
+  font-weight: 400;
+}
 
 /* ═══ TOOLBAR ═══ */
-.toolbar{max-width:var(--w);margin:0 auto;padding:0 24px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.toolbar select{-webkit-appearance:none;appearance:none;background:var(--surface);color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:9px 36px 9px 14px;font-size:14px;font-weight:500;cursor:pointer;transition:border-color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6' fill='none' stroke='%23868b8b' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.toolbar select:hover{border-color:rgba(255,255,255,.18)}
-.toolbar select:focus{outline:none;border-color:var(--gold)}
-.t-search{flex:1;min-width:160px;background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:9px 14px;color:var(--text);font-size:14px;transition:border-color .15s;font-weight:400}
-.t-search::placeholder{color:var(--text3)}.t-search:focus{outline:none;border-color:var(--gold)}
-.t-count{font-size:13px;color:var(--text3);white-space:nowrap}
+.toolbar {
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 0 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#sortSelect {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#sortSelect:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.t-search {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.t-search::placeholder {
+  color: var(--text3);
+}
+
+.t-count {
+  font-size: 13px;
+  color: var(--text3);
+  white-space: nowrap;
+}
 
 /* ═══ CATEGORIES ═══ */
-.cat-scroll{max-width:var(--w);margin:0 auto;padding:0 24px 20px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
-.cat-scroll::-webkit-scrollbar{display:none}
-.cat-list{display:flex;gap:10px}
-.cat-item{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:8px 18px;border-radius:24px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;user-select:none;white-space:nowrap}
-.cat-item:hover{border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.04)}
-.cat-item.active{background:var(--gold);border-color:var(--gold);color:#0a0a0a}
+.cat-scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 24px;
+  margin: 0 calc(-1 * var(--gap));
+}
+
+.cat-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-list {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  max-width: var(--w);
+  margin: 0 auto;
+}
+
+.cat-item {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text2);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cat-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+.cat-item.active {
+  background: var(--gold);
+  color: #0a0a0a;
+  font-weight: 500;
+}
 
 /* ═══ GALLERY ═══ */
-.gallery{max-width:var(--w);margin:0 auto;padding:0 24px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:var(--gap)}
-.card{display:flex;flex-direction:column;border-radius:var(--radius);overflow:hidden;background:var(--surface);border:1px solid rgba(255,255,255,.06);transition:transform .25s,box-shadow .25s,border-color .25s;cursor:pointer;will-change:transform}
-.card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.5);border-color:rgba(255,255,255,.12)}
-.card.top1{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 8px 30px rgba(212,175,55,.15)}
-.card.top2{border-color:#c0c0c0}
-.card.top3{border-color:#cd7f32}
-.card.top4{border-color:#e8616e}
-.card.top5{border-color:#3a7bd5}
-.card-wrap{position:relative;aspect-ratio:9/16;overflow:hidden;background:var(--surface2)}
-.card-img{width:100%;height:100%;object-fit:cover;transition:transform .3s,opacity .5s;opacity:0;background:var(--surface2)}
-.card-img.loaded{opacity:1}
-.card:hover .card-img{transform:scale(1.05)}
-.card-rank{position:absolute;top:8px;left:8px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;letter-spacing:.02em;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:2}
-.card.top1 .card-rank{background:rgba(212,175,55,.9);color:#0a0a0a}
-.card.top2 .card-rank{background:rgba(192,192,192,.8);color:#0a0a0a}
-.card.top3 .card-rank{background:rgba(205,127,50,.8);color:#fff}
-.card.top4 .card-rank{background:rgba(232,97,110,.7);color:#fff}
-.card.top5 .card-rank{background:rgba(58,123,213,.7);color:#fff}
-.card-body{padding:12px 14px 14px}
-.card-cat{font-size:11px;font-weight:500;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
-.card-title{font-size:13px;font-weight:500;color:var(--text);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px}
-.card-votes{display:flex;gap:4px}
-.card-votes .btn{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:all .12s;min-height:36px;-webkit-tap-highlight-color:transparent;user-select:none;will-change:transform}
-.card-votes .btn:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.04)}
-.card-votes .btn:active{transform:scale(.92)!important}
-.card-votes .btn.like.active{background:rgba(52,199,89,.2);border-color:#34c759;color:#34c759}
-.card-votes .btn.dislike.active{background:rgba(255,69,58,.15);border-color:#ff453a;color:#ff453a}
-.card-votes .btn.del{padding:6px 10px;flex:0 0 auto;opacity:.4;transition:opacity .15s}
-.card-votes .btn.del:hover{opacity:1;background:rgba(255,69,58,.1);border-color:rgba(255,69,58,.3)}
+.gallery {
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 0 24px 40px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--gap);
+  scroll-behavior: smooth;
+}
 
-/* ═══ MODAL ═══ */
-.modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .25s}
-.modal.show{opacity:1;pointer-events:all}
-.modal-box{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:28px;width:340px;max-width:90vw}
-.modal-box h3{font-size:18px;font-weight:600;margin-bottom:16px}
-.modal-box input{width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:var(--surface2);color:var(--text);font-size:15px;outline:none}
-.modal-box input:focus{border-color:var(--gold)}
-.modal-err{color:#ff453a;font-size:13px;margin-top:8px;display:none}
-.modal-actions{display:flex;gap:10px;margin-top:18px}
-.modal-actions button{flex:1;padding:11px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
-.btn-cancel{background:var(--surface2);color:var(--text2)}
-.btn-cancel:hover{background:#2a2a2d;color:var(--text)}
-.btn-del{background:#ff453a;color:#fff}
-.btn-del:hover{background:#e03e34}
+@media (max-width: 1023px) {
+  .gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  aspect-ratio: 9/16;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card.top1,
+.card.top2,
+.card.top3,
+.card.top4,
+.card.top5 {
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 4px 16px rgba(212, 175, 55, 0.2);
+}
+
+.card.top2 {
+  border-color: #c0c0c0;
+  box-shadow: 0 0 0 1px #c0c0c0, 0 4px 16px rgba(192, 192, 192, 0.2);
+}
+
+.card.top3 {
+  border-color: #cd7f32;
+  box-shadow: 0 0 0 1px #cd7f32, 0 4px 16px rgba(205, 127, 50, 0.2);
+}
+
+.card.top4 {
+  border-color: #e8616e;
+  box-shadow: 0 0 0 1px #e8616e, 0 4px 16px rgba(232, 97, 110, 0.2);
+}
+
+.card.top5 {
+  border-color: #3a7bd5;
+  box-shadow: 0 0 0 1px #3a7bd5, 0 4px 16px rgba(58, 123, 213, 0.2);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.card-wrap {
+  position: relative;
+  aspect-ratio: 9/16;
+  overflow: hidden;
+  background: var(--surface2);
+  cursor: pointer;
+}
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s, opacity 0.6s;
+  opacity: 0;
+  background: var(--surface2);
+}
+
+.card-img.loaded {
+  opacity: 1;
+}
+
+.card:hover .card-img {
+  transform: scale(1.06);
+}
+
+.card-rank {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.card.top1 .card-rank {
+  background: rgba(212, 175, 55, 0.85);
+  color: #0a0a0a;
+}
+
+.card.top2 .card-rank {
+  background: rgba(192, 192, 192, 0.8);
+  color: #0a0a0a;
+}
+
+.card.top3 .card-rank {
+  background: rgba(205, 127, 50, 0.8);
+  color: #fff;
+}
+
+.card.top4 .card-rank {
+  background: rgba(232, 97, 110, 0.7);
+  color: #fff;
+}
+
+.card.top5 .card-rank {
+  background: rgba(58, 123, 213, 0.7);
+  color: #fff;
+}
+
+.card-body {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.card-cat {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 40px;
+}
+
+.card-votes {
+  margin-top: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+.card-votes .btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 7px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: var(--text2);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 36px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.card-votes .btn:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.card-votes .btn:active {
+  transform: scale(0.94);
+}
+
+.card-votes .btn.like.active {
+  background: rgba(52, 199, 89, 0.2);
+  border-color: #34c759;
+  color: #34c759;
+}
+
+.card-votes .btn.dislike.active {
+  background: rgba(255, 69, 58, 0.15);
+  border-color: #ff453a;
+  color: #ff453a;
+}
+
+.card-votes .btn.del {
+  flex: 0 0 36px;
+  padding: 0;
+  display: none;
+}
+
+.card:hover .card-votes .btn.del {
+  display: flex;
+}
+
+/* ═══ EMPTY STATE ═══ */
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px;
+  color: var(--text3);
+  font-size: 16px;
+}
+
+/* ═══ ADMIN MODAL ═══ */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.modal.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal-box {
+  background: var(--surface);
+  padding: 24px;
+  border-radius: var(--radius);
+  width: 320px;
+  max-width: 90vw;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.modal input {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.modal-err {
+  color: #ff453a;
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: var(--text2);
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-del {
+  background: #ff453a;
+  color: #fff;
+}
+
+.btn-del:hover {
+  background: #e03e30;
+}
 
 /* ═══ LIGHTBOX ═══ */
-.lightbox{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
-.lightbox.show{opacity:1;pointer-events:all}
-.lightbox img{max-width:92vw;max-height:88vh;border-radius:10px;object-fit:contain;transition:opacity .3s;opacity:0}
-.lightbox img.loaded{opacity:1}
-.lb-close{position:fixed;top:20px;right:20px;width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.08);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;font-size:22px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;z-index:10}
-.lb-close:hover{background:rgba(255,255,255,.16);transform:scale(1.08)}
-.lb-nav{position:fixed;top:50%;z-index:10;width:48px;height:48px;border-radius:50%;border:none;background:rgba(255,255,255,.06);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;font-size:20px;cursor:pointer;transition:all .12s;display:flex;align-items:center;justify-content:center;transform:translateY(-50%) scale(0);pointer-events:none}
-.lightbox.show .lb-nav{transform:translateY(-50%) scale(1);pointer-events:all}
-.lb-nav:hover{background:rgba(255,255,255,.14);transform:translateY(-50%) scale(1.08)!important}
-.lb-prev{left:20px}.lb-next{right:20px}
-.lb-nav.hidden{display:none}
-.lb-info{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:32px;padding:20px 24px 28px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:14px;z-index:10}
-.lb-info .lb-title{color:var(--text);font-weight:500}
-.lb-info .lb-cat{color:var(--text2)}
-@keyframes spin{to{transform:rotate(360deg)}}
-.lb-spinner{position:fixed;width:24px;height:24px;border-radius:50%;border:3px solid rgba(255,255,255,.1);border-top-color:var(--gold);animation:spin .6s linear infinite;z-index:5;pointer-events:none}
+.lightbox {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
 
-@media(max-width:768px){
-  .hero h1{font-size:34px}.hero{padding:40px 16px 24px}
-  .toolbar{padding:0 16px 12px}
-  .gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;padding:0 16px 80px}
-  .cat-scroll{padding:0 16px 16px}.h-inner{padding:10px 16px}
-  .hero p{font-size:16px}
+.lightbox.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#lbImg {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  transition: opacity 0.4s;
+}
+
+.lb-info {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  padding: 20px 24px 28px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  font-size: 14px;
+}
+
+.lb-info .lb-title {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.lb-info .lb-cat {
+  color: var(--text2);
+  font-weight: 400;
+}
+
+.lb-close {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lb-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.08);
+}
+
+.lb-nav {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lightbox.show .lb-nav {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.lb-nav:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.lb-prev {
+  left: 20px;
+}
+
+.lb-next {
+  right: 20px;
+}
+
+@media (max-width: 768px) {
+  .lb-nav {
+    display: none;
+  }
+}
+
+/* ═══ TOAST ═══ */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: rgba(22, 22, 23, 0.95);
+  backdrop-filter: blur(16px);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 400;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ═══ WELCOME MODAL ═══ */
+#welcomeModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+#welcomeModal.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+#welcomeModal .modal-content {
+  background: var(--surface);
+  padding: 24px;
+  border-radius: var(--radius);
+  width: 360px;
+  max-width: 90vw;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#welcomeModal h2 {
+  font-size: 20px;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+#welcomeModal p {
+  color: var(--text2);
+  margin-bottom: 16px;
+}
+
+#welcomeModal ul {
+  margin-bottom: 20px;
+  padding-left: 20px;
+}
+
+#welcomeModal li {
+  color: var(--text2);
+  margin-bottom: 8px;
+}
+
+#welcomeModal li strong {
+  color: var(--text);
+}
+
+#closeWelcome {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--gold);
+  color: #0a0a0a;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#closeWelcome:hover {
+  background: #c8a84e;
+}
+
+/* ═══ KEYBOARD HINT ═══ */
+.kb-hint {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  font-size: 11px;
+  color: var(--text3);
+  z-index: 50;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .kb-hint {
+    display: none;
+  }
 }
 </style>
 </head>
 <body>
+
+<!-- WELCOME MODAL -->
+<div class="modal" id="welcomeModal">
+  <div class="modal-content">
+    <h2>🌊 Welcome to Moodhu Designs</h2>
+    <p>This is an anonymous voting gallery for ocean-themed artworks.</p>
+    <ul>
+      <li>👍 Click <strong>Like</strong> to vote for your favorite designs</li>
+      <li>👎 Click <strong>Dislike</strong> if you don't like it</li>
+      <li>🔍 Use the search bar to find specific artworks</li>
+      <li>🏆 Top 5 designs are highlighted with gold borders</li>
+    </ul>
+    <button id="closeWelcome">Got it!</button>
+  </div>
+</div>
 
 <!-- HEADER -->
 <header>
@@ -128,8 +783,8 @@ header{position:sticky;top:0;z-index:100;background:rgba(26,26,28,.92);backdrop-
 
 <!-- HERO -->
 <div class="hero">
-  <h1>Ocean Art Collection</h1>
-  <p>Inspired by the beauty of the Maldives · <span id="heroTotal">0</span> unique designs</p>
+  <h1>Ocean Art Gallery</h1>
+  <p><span id="heroTotal">0</span> unique designs inspired by the beauty of the Maldives</p>
 </div>
 
 <!-- TOOLBAR -->
@@ -181,69 +836,92 @@ header{position:sticky;top:0;z-index:100;background:rgba(26,26,28,.92);backdrop-
 
 <script>
 // ═══ CONFIG ═══
-const API = (() => { const l = window.location; return l.hostname === 'localhost' || l.hostname === '127.0.0.1' ? `http://${l.hostname}:8000` : l.origin; })();
-const PWD = 'moodhu2024';
+const API_BASE = (() => {
+  const l = window.location;
+  return l.hostname === 'localhost' || l.hostname === '127.0.0.1' ? `http://${l.hostname}:8000` : l.origin;
+})();
+const ADMIN_PASSWORD = 'moodhu2024';
 
 // ═══ STATE ═══
-let designs = [], filtered = [], votes = {}, myVotes = {}, cat = 'all', sort = 'votes', search = '', delTarget = null;
-let _toastTimer;
-const VID = (() => {
+let designs = [],
+    filtered = [],
+    votes = {},
+    myVotes = {},
+    cat = 'all',
+    sort = 'votes',
+    search = '',
+    deleteTarget = null,
+    lbIdx = null;
+
+const VOTER_ID = (() => {
   let v = localStorage.getItem('mv');
   if (!v) {
     const s = navigator.userAgent + screen.width + screen.height + screen.colorDepth + navigator.language;
     let h = 0;
-    for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+    for (let i = 0; i < s.length; i++) {
+      h = ((h << 5) - h) + s.charCodeAt(i);
+      h |= 0;
+    }
     v = 'v_' + Math.abs(h).toString(36) + '_' + Date.now().toString(36);
     localStorage.setItem('mv', v);
   }
   return v;
 })();
 
-// ═══ LIGHTBOX STATE ═══
-let lbIdx = null;
-
 // ═══ TOAST ═══
-function toast(m) {
+let toastTimer;
+function toast(msg, type = '') {
   const el = document.getElementById('toast');
-  el.textContent = m; el.className = 'toast show';
-  clearTimeout(_toastTimer); _toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
 }
 
 // ═══ INIT ═══
 async function init() {
   try {
-    const dd = await fetch(API + '/api/designs').then(r => r.json());
-    designs = dd.designs || [];
+    // Show welcome modal if first visit
+    if (!localStorage.getItem('welcomeShown')) {
+      document.getElementById('welcomeModal').classList.add('show');
+    }
     
+    // Load designs
+    const designData = await fetch(`${API_BASE}/api/designs`).then(r => r.json());
+    designs = designData.designs || [];
+    
+    // Load votes
     try {
-      const vc = await fetch(API + '/api/votes').then(r => r.json());
+      const voteCounts = await fetch(`${API_BASE}/api/votes`).then(r => r.json());
       designs.forEach(d => {
-        d.vc = vc[d.id] || { likes: 0, dislikes: 0 };
-        d.vc.net = (d.vc.likes || 0) - (d.vc.dislikes || 0);
+        d.votes = voteCounts[d.id] || { likes: 0, dislikes: 0 };
+        d.votes.net = d.votes.likes - d.votes.dislikes;
       });
-    } catch(e) { designs.forEach(d => d.vc = { likes: 0, dislikes: 0, net: 0 }); }
+    } catch(e) {
+      designs.forEach(d => d.votes = { likes: 0, dislikes: 0, net: 0 });
+    }
     
-    try { myVotes = await fetch(API + '/api/votes/me?voter_id=' + VID).then(r => r.json()); } catch(e) { myVotes = {}; }
+    // Load my votes
+    try {
+      myVotes = await fetch(`${API_BASE}/api/votes/me?voter_id=${VOTER_ID}`).then(r => r.json());
+    } catch(e) {
+      myVotes = {};
+    }
     
-    const cats = [...new Set(designs.map(d => d.category))].sort();
-    document.getElementById('catList').innerHTML =
-      '<div class="cat-item active" data-c="all">All</div>' +
-      cats.map(c => '<div class="cat-item" data-c="' + c.replace(/"/g,'&quot;') + '">' + emojiFor(c) + ' ' + c + '</div>').join('');
+    // Categories
+    const categories = [...new Set(designs.map(d => d.category))].sort();
+    document.getElementById('catList').innerHTML = `
+      <div class="cat-item active" data-c="all">All</div>
+      ${categories.map(c => `<div class="cat-item" data-c="${c}">${emojiFor(c)} ${c}</div>`).join('')}
+    `;
     
-    document.querySelectorAll('.cat-item').forEach(el => {
-      el.onclick = function() {
-        document.querySelectorAll('.cat-item').forEach(x => x.classList.remove('active'));
-        this.classList.add('active');
-        cat = this.dataset.c;
-        window.location.hash = cat === 'all' ? '' : cat;
-        applyFilters();
-      };
-    });
-    
+    // Restore category from hash
     if (window.location.hash) {
       const h = decodeURIComponent(window.location.hash.slice(1));
-      const el = document.querySelector('.cat-item[data-c="' + CSS.escape(h) + '"]');
-      if (el) el.click();
+      const el = document.querySelector(`.cat-item[data-c="${CSS.escape(h)}"]`);
+      if (el) {
+        el.click();
+      }
     }
     
     applyFilters();
@@ -254,261 +932,257 @@ async function init() {
   }
 }
 
-function emojiFor(c) {
-  const m = { 'Clownfish':'🐠', 'Dolphin':'🐬', 'ReefShark':'🦈', 'Hammerhead':'🦈', 'NapoleonWrasse':'🐟', 'Manta':'🌊', 'Turtle':'🐢', 'Whale':'🐋', 'Coral':'🪸' };
-  for (const [k, v] of Object.entries(m)) { if (c.toLowerCase().includes(k.toLowerCase())) return v; }
+function emojiFor(category) {
+  const map = {
+    'Clownfish': '🐠',
+    'Dolphin': '🐬',
+    'ReefShark': '🦈',
+    'Hammerhead': '🦈',
+    'NapoleonWrasse': '🐟',
+    'Manta': '🌊',
+    'Turtle': '🐢',
+    'Whale': '🐋',
+    'Coral': '🪸',
+    'Reference': '📐'
+  };
+  for (const [k, v] of Object.entries(map)) {
+    if (category.toLowerCase().includes(k.toLowerCase())) return v;
+  }
   return '🖼️';
 }
 
-function rankOf(i) {
-  if (i === 0) return 1; if (i === 1) return 2; if (i === 2) return 3; if (i === 3) return 4; if (i === 4) return 5;
+function rankOf(index) {
+  if (index === 0) return 1;
+  if (index === 1) return 2;
+  if (index === 2) return 3;
+  if (index === 3) return 4;
+  if (index === 4) return 5;
   return 0;
 }
 
-function rankLabel(r) {
-  return r === 1 ? '🏆 NO.1' : r === 2 ? '🥈 NO.2' : r === 3 ? '🥉 NO.3' : r === 4 ? 'NO.4' : r === 5 ? 'NO.5' : '';
+function rankLabel(rank) {
+  return rank === 1 ? '🏆 NO.1' : rank === 2 ? '🥈 NO.2' : rank === 3 ? '🥉 NO.3' : rank === 4 ? 'NO.4' : rank === 5 ? 'NO.5' : '';
 }
 
 function applyFilters() {
   let items = [...designs];
-  if (cat !== 'all') items = items.filter(d => d.category === cat);
-  if (search) items = items.filter(d => d.title.toLowerCase().includes(search) || d.category.toLowerCase().includes(search));
-  if (sort === 'likes') items.sort((a, b) => (b.vc.likes || 0) - (a.vc.likes || 0));
-  else if (sort === 'newest') items.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
-  else items.sort((a, b) => (b.vc.net || 0) - (a.vc.net || 0));
+  
+  // Category
+  if (cat !== 'all') {
+    items = items.filter(d => d.category === cat);
+  }
+  
+  // Search
+  if (search) {
+    const q = search.toLowerCase();
+    items = items.filter(d => 
+      d.title.toLowerCase().includes(q) ||
+      d.category.toLowerCase().includes(q)
+    );
+  }
+  
+  // Sort
+  if (sort === 'likes') {
+    items.sort((a, b) => b.votes.likes - a.votes.likes);
+  } else if (sort === 'newest') {
+    items.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+  } else {
+    items.sort((a, b) => b.votes.net - a.votes.net);
+  }
+  
   filtered = items;
   render();
 }
 
 function render() {
   const g = document.getElementById('gallery');
+  
   if (!filtered.length) {
-    g.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:80px 20px"><div style="font-size:48px;margin-bottom:12px">🔍</div><div style="color:var(--text2);font-size:16px">No designs found</div></div>';
-    document.getElementById('resultCount').textContent = '';
-    updateStats();
+    g.innerHTML = '<div class="empty">No designs found. Try a different search or category.</div>';
     return;
   }
   
-  // Build gallery HTML using DocumentFragment (fastest DOM method)
-  let html = '';
-  filtered.forEach((d, i) => {
-    const rank = rankOf(i);
-    const rl = rankLabel(rank);
-    const v = d.vc || { likes: 0, dislikes: 0 };
+  g.innerHTML = filtered.map((d, i) => {
     const mv = myVotes[d.id];
-    const tc = 'top' + (rank > 0 && rank <= 5 ? rank : '');
-    
-    html += '<div class="card ' + (rank > 0 && rank <= 5 ? tc : '') + '" data-idx="' + i + '">' +
-      '<div class="card-wrap" data-lb="' + i + '">' +
-        (rl ? '<div class="card-rank">' + rl + '</div>' : '') +
-        '<img class="card-img" src="thumbs/' + d.filename + '" alt="' + d.title.replace(/"/g,'&quot;') + '" loading="lazy" onload="this.classList.add(\'loaded\')" onerror="this.parentElement.innerHTML=\'<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:28px;opacity:.4>✕</div>\'">' +
-      '</div>' +
-      '<div class="card-body">' +
-        '<div class="card-cat">' + d.category + '</div>' +
-        '<div class="card-title">' + d.title + '</div>' +
-        '<div class="card-votes">' +
-          '<button class="btn like' + (mv === 'like' ? ' active' : '') + '" data-vote="' + i + '" data-type="like">👍 <span class="c">' + (v.likes || 0) + '</span></button>' +
-          '<button class="btn dislike' + (mv === 'dislike' ? ' active' : '') + '" data-vote="' + i + '" data-type="dislike">👎 <span class="c">' + (v.dislikes || 0) + '</span></button>' +
-          '<button class="btn del" data-del="' + d.id + '" title="Delete">🗑️</button>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  });
+    const v = d.votes;
+    const rank = rankOf(i);
+    return `
+      <div class="card${rank ? ' top' + rank : ''}" data-index="${i}">
+        <div class="card-wrap" onclick="openLb(${i})">
+          ${rank ? `<div class="card-rank">${rankLabel(rank)}</div>` : ''}
+          <img class="card-img" 
+               src="thumbs/${d.filename}" 
+               alt="${d.title}" 
+               loading="lazy" 
+               fetchpriority="${i < 6 ? 'high' : 'low'}" 
+               onload="this.classList.add('loaded')" 
+               onerror="this.parentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:28px;opacity:.4>✕</div>'">
+        </div>
+        <div class="card-body">
+          <div class="card-cat">${d.category}</div>
+          <div class="card-title">${d.title}</div>
+          <div class="card-votes">
+            <button class="btn like${mv === 'like' ? ' active' : ''}" 
+                   data-vote-index="${i}" 
+                   data-vote-type="like" 
+                   onclick="cast(${i}, 'like', this)">
+              👍 ${v.likes || 0}
+            </button>
+            <button class="btn dislike${mv === 'dislike' ? ' active' : ''}" 
+                   data-vote-index="${i}" 
+                   data-vote-type="dislike" 
+                   onclick="cast(${i}, 'dislike', this)">
+              👎 ${v.dislikes || 0}
+            </button>
+            <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
   
-  g.innerHTML = html;
+  document.getElementById('resultCount').textContent = 
+    filtered.length < designs.length ? `${filtered.length} of ${designs.length}` : '';
   
-  // Attach event listeners via delegation (one listener per action type)
-  g.querySelectorAll('.card-wrap[data-lb]').forEach(el => {
-    el.onclick = function(e) { if (e.target.tagName !== 'IMG' || e.target.classList.contains('loaded')) openLb(parseInt(this.dataset.lb)); };
-  });
-  g.querySelectorAll('[data-vote]').forEach(el => {
-    el.onclick = function(e) { e.stopPropagation(); cast(parseInt(this.dataset.vote), this.dataset.type, this); };
-  });
-  g.querySelectorAll('[data-del]').forEach(el => {
-    el.onclick = function(e) { e.stopPropagation(); openModal(this.dataset.del); };
-  });
-  
-  document.getElementById('resultCount').textContent = filtered.length < designs.length ? filtered.length + ' of ' + designs.length : '';
   updateStats();
 }
 
 function updateStats() {
-  const tv = designs.reduce((s, d) => s + (d.vc.likes || 0) + (d.vc.dislikes || 0), 0);
+  const totalVotes = designs.reduce((s, d) => s + d.votes.likes + d.votes.dislikes, 0);
   document.getElementById('hWorks').textContent = designs.length;
-  document.getElementById('hVotes').textContent = tv;
+  document.getElementById('hVotes').textContent = totalVotes;
   document.getElementById('heroTotal').textContent = designs.length;
 }
 
-// ═══ VOTE — optimistic update ═══
-async function cast(i, type, btn) {
-  const d = filtered[i];
+// ═══ VOTE ═══
+async function cast(index, type, btn) {
+  const d = filtered[index];
   if (!d) return;
   
-  // Optimistic UI: update count immediately
-  const prevType = myVotes[d.id];
-  const countSpan = btn.querySelector('.c');
-  const siblingBtn = btn.parentElement.querySelector('[data-type="' + (type === 'like' ? 'dislike' : 'like') + '"]');
-  const siblingCount = siblingBtn?.querySelector('.c');
-  const prevCount = parseInt(countSpan.textContent) || 0;
+  // Optimistic update
+  const prevVote = myVotes[d.id];
+  const prevLikes = d.votes.likes;
+  const prevDislikes = d.votes.dislikes;
   
-  // Remove prev vote if exists
-  if (prevType) {
-    const prevBtn = btn.parentElement.querySelector('[data-type="' + prevType + '"]');
-    const prevSpan = prevBtn?.querySelector('.c');
-    if (prevSpan) prevSpan.textContent = Math.max(0, (parseInt(prevSpan.textContent) || 0) - 1);
-    prevBtn?.classList.remove('active');
-  }
-  
-  // Add new vote (or toggle if same type)
-  if (prevType === type) {
-    // Cancelling vote
-    myVotes[d.id] = null;
-    countSpan.textContent = Math.max(0, prevCount - 1);
-    btn.classList.remove('active');
+  // Update UI immediately
+  btn.classList.add('active');
+  if (type === 'like') {
+    d.votes.likes++;
+    if (prevVote === 'dislike') d.votes.dislikes--;
   } else {
-    // Adding new vote
-    myVotes[d.id] = type;
-    countSpan.textContent = prevCount + 1;
-    btn.classList.add('active');
+    d.votes.dislikes++;
+    if (prevVote === 'like') d.votes.likes--;
+  }
+  d.votes.net = d.votes.likes - d.votes.dislikes;
+  myVotes[d.id] = type;
+  
+  // Update the specific card
+  const card = document.querySelector(`.card[data-index="${index}"] .card-votes`);
+  if (card) {
+    card.innerHTML = `
+      <button class="btn like${type === 'like' ? ' active' : ''}" 
+             data-vote-index="${index}" 
+             data-vote-type="like" 
+             onclick="cast(${index}, 'like', this)">
+        👍 ${d.votes.likes}
+      </button>
+      <button class="btn dislike${type === 'dislike' ? ' active' : ''}" 
+             data-vote-index="${index}" 
+             data-vote-type="dislike" 
+             onclick="cast(${index}, 'dislike', this)">
+        👎 ${d.votes.dislikes}
+      </button>
+      <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
+    `;
   }
   
-  // Sync with server (non-blocking)
+  // Async sync with server
   try {
-    const r = await fetch(API + '/api/vote?voter_id=' + VID, {
+    const res = await fetch(`${API_BASE}/api/vote?voter_id=${VOTER_ID}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ design_id: d.id, vote_type: type })
+      body: JSON.stringify({ design_id: d.id, action: type })
     });
-    const res = await r.json();
-    if (r.ok && res.votes) {
-      d.vc = res.votes;
-      d.vc.net = (res.votes.likes || 0) - (res.votes.dislikes || 0);
-      // Update all visible count spans for this design
-      document.querySelectorAll('[data-vote]').forEach(el => {
-        if (parseInt(el.dataset.vote) === i) {
-          const sp = el.querySelector('.c');
-          if (sp) sp.textContent = d.vc[el.dataset.type === 'like' ? 'likes' : 'dislikes'] || 0;
-        }
-      });
-      updateStats();
-    } else {
-      // Server rejected — revert
-      myVotes[d.id] = prevType;
+    
+    if (!res.ok) throw new Error('Vote failed');
+    
+    // Re-sort and re-render if needed
+    if (sort === 'votes' || sort === 'likes') {
       applyFilters();
-      toast('❌ Vote failed');
     }
+    
   } catch(e) {
-    toast('⚠️ Connection issue — vote recorded locally');
-  }
-  
-  // Temporarily disable button to prevent double-click (re-enable after 500ms)
-  btn.style.pointerEvents = 'none';
-  setTimeout(() => { btn.style.pointerEvents = ''; }, 400);
-}
-
-// ═══ ADMIN MODAL ═══
-function openModal(id) {
-  delTarget = id;
-  document.getElementById('pwdInput').value = '';
-  document.getElementById('pwdError').style.display = 'none';
-  document.getElementById('adminModal').classList.add('show');
-  setTimeout(() => document.getElementById('pwdInput').focus(), 100);
-}
-
-function closeModal() {
-  document.getElementById('adminModal').classList.remove('show');
-  delTarget = null;
-}
-
-document.getElementById('pwdConfirm').onclick = async function() {
-  const pwd = document.getElementById('pwdInput').value;
-  if (pwd !== PWD) {
-    document.getElementById('pwdError').style.display = 'block';
-    return;
-  }
-  try {
-    const r = await fetch(API + '/api/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ design_id: delTarget, password: pwd })
-    });
-    const res = await r.json();
-    if (r.ok && res.ok) {
-      toast('🗑️ Permanently deleted');
-      closeModal();
-      await init();
-    } else {
-      toast('❌ Delete failed');
+    // Rollback on error
+    console.error('Vote error:', e);
+    d.votes.likes = prevLikes;
+    d.votes.dislikes = prevDislikes;
+    d.votes.net = prevLikes - prevDislikes;
+    myVotes[d.id] = prevVote;
+    toast('❌ Vote failed. Try again.');
+    
+    // Re-render the card
+    const card = document.querySelector(`.card[data-index="${index}"] .card-votes`);
+    if (card) {
+      card.innerHTML = `
+        <button class="btn like${prevVote === 'like' ? ' active' : ''}" 
+               data-vote-index="${index}" 
+               data-vote-type="like" 
+               onclick="cast(${index}, 'like', this)">
+          👍 ${prevLikes}
+        </button>
+        <button class="btn dislike${prevVote === 'dislike' ? ' active' : ''}" 
+               data-vote-index="${index}" 
+               data-vote-type="dislike" 
+               onclick="cast(${index}, 'dislike', this)">
+          👎 ${prevDislikes}
+        </button>
+        <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
+      `;
     }
-  } catch(e) {
-    toast('❌ Server error');
   }
-};
+}
 
-document.getElementById('pwdInput').onkeydown = e => {
-  if (e.key === 'Enter') document.getElementById('pwdConfirm').click();
-};
-
-document.getElementById('adminModal').onclick = function(e) {
-  if (e.target === this) closeModal();
-};
-
-document.getElementById('btnCancel').onclick = closeModal;
-
-// ═══ LIGHTBOX — progressive loading ═══
-const lbImg = document.getElementById('lbImg');
-const lightbox = document.getElementById('lightbox');
-const lbTitle = document.getElementById('lbTitle');
-const lbCat = document.getElementById('lbCat');
-const lbRank = document.getElementById('lbRank');
-const lbPrev = document.getElementById('lbPrev');
-const lbNext = document.getElementById('lbNext');
-
-function openLb(idx) {
-  const d = filtered[idx];
+// ═══ LIGHTBOX ═══
+function openLb(index) {
+  lbIdx = index;
+  const d = filtered[index];
   if (!d) return;
-  lbIdx = idx;
-  
-  // Update info immediately
-  lbTitle.textContent = d.title;
-  lbCat.textContent = d.category;
-  const r = rankOf(filtered.indexOf(d));
-  lbRank.textContent = r ? ' · ' + rankLabel(r) : '';
   
   // Show thumbnail immediately
-  lbImg.classList.remove('loaded');
-  lbImg.src = 'thumbs/' + d.filename;
+  document.getElementById('lbImg').src = `thumbs/${d.filename}`;
+  document.getElementById('lbImg').alt = d.title;
+  document.getElementById('lbTitle').textContent = d.title;
+  document.getElementById('lbCat').textContent = d.category;
+  const r = rankOf(index);
+  document.getElementById('lbRank').textContent = r ? ' · ' + rankLabel(r) : '';
   
-  // Preload full-size image in background
-  const fullImg = new Image();
-  fullImg.onload = function() {
-    lbImg.src = fullImg.src;
-    lbImg.classList.add('loaded');
-  };
-  fullImg.onerror = function() {
-    // If full image fails, keep thumbnail (already showing)
-    lbImg.classList.add('loaded');
-  };
-  fullImg.src = 'images/' + d.filename;
-  
-  // Prefetch adjacent images
-  prefetchLb(idx - 1);
-  prefetchLb(idx + 1);
-  
-  // Nav visibility
-  lbPrev.classList.toggle('hidden', !filtered[idx - 1]);
-  lbNext.classList.toggle('hidden', !filtered[idx + 1]);
-  
-  lightbox.classList.add('show');
+  document.getElementById('lightbox').classList.add('show');
   document.body.style.overflow = 'hidden';
-}
-
-function prefetchLb(idx) {
-  if (idx < 0 || idx >= filtered.length) return;
-  const d = filtered[idx];
-  if (!d) return;
+  
+  // Update nav visibility
+  document.getElementById('lbPrev').style.display = index > 0 ? '' : 'none';
+  document.getElementById('lbNext').style.display = index < filtered.length - 1 ? '' : 'none';
+  
+  // Preload high-res image
   const img = new Image();
-  img.src = 'images/' + d.filename;
+  img.src = `images/${d.filename}`;
+  img.onload = () => {
+    document.getElementById('lbImg').style.opacity = 0;
+    setTimeout(() => {
+      document.getElementById('lbImg').src = img.src;
+      document.getElementById('lbImg').style.opacity = 1;
+    }, 200);
+  };
+  
+  // Preload next/prev images
+  if (index > 0) {
+    const prevImg = new Image();
+    prevImg.src = `images/${filtered[index - 1].filename}`;
+  }
+  if (index < filtered.length - 1) {
+    const nextImg = new Image();
+    nextImg.src = `images/${filtered[index + 1].filename}`;
+  }
 }
 
 function navigateLb(dir) {
@@ -518,40 +1192,109 @@ function navigateLb(dir) {
 }
 
 function closeLb() {
-  lightbox.classList.remove('show');
+  document.getElementById('lightbox').classList.remove('show');
   document.body.style.overflow = '';
   lbIdx = null;
 }
 
-// ═══ EVENT BINDING ═══
-document.getElementById('lbClose').onclick = closeLb;
-lbPrev.onclick = () => navigateLb(-1);
-lbNext.onclick = () => navigateLb(1);
-lightbox.onclick = function(e) { if (e.target === this) closeLb(); };
-
-// Keyboard shortcuts
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') { closeLb(); if (document.getElementById('adminModal').classList.contains('show')) closeModal(); }
-  if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && lbIdx !== null) {
-    e.preventDefault();
-    navigateLb(e.key === 'ArrowLeft' ? -1 : 1);
+// ═══ ADMIN DELETE ═══
+async function doDelete() {
+  const pwd = document.getElementById('pwdInput').value;
+  if (pwd !== ADMIN_PASSWORD) {
+    document.getElementById('pwdError').style.display = 'block';
+    return;
   }
-});
+  
+  try {
+    const res = await fetch(`${API_BASE}/api/delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ design_id: deleteTarget, password: pwd })
+    });
+    
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      toast('🗑️ Permanently deleted');
+      closeModal();
+      await init(); // Reload everything
+    } else {
+      toast('❌ Delete failed: ' + (data.message || 'Unknown error'));
+    }
+  } catch(e) {
+    toast('❌ Server error');
+  }
+}
 
-// Sort + search
-document.getElementById('sortSelect').onchange = function() {
-  sort = this.value;
+function openModal(id) {
+  deleteTarget = id;
+  document.getElementById('pwdInput').value = '';
+  document.getElementById('pwdError').style.display = 'none';
+  document.getElementById('adminModal').classList.add('show');
+  setTimeout(() => document.getElementById('pwdInput').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('adminModal').classList.remove('show');
+  deleteTarget = null;
+}
+
+// ═══ EVENT LISTENERS ═══
+document.getElementById('closeWelcome').onclick = () => {
+  document.getElementById('welcomeModal').classList.remove('show');
+  localStorage.setItem('welcomeShown', '1');
+};
+
+document.getElementById('sortSelect').onchange = () => {
+  sort = document.getElementById('sortSelect').value;
   applyFilters();
 };
 
-const searchInput = document.getElementById('searchInput');
-let _searchTimer;
-searchInput.oninput = function() {
-  clearTimeout(_searchTimer);
-  _searchTimer = setTimeout(() => {
-    search = this.value.toLowerCase().trim();
+document.getElementById('searchInput').oninput = () => {
+  search = document.getElementById('searchInput').value.trim();
+  applyFilters();
+};
+
+document.getElementById('pwdConfirm').onclick = doDelete;
+
+document.getElementById('btnCancel').onclick = closeModal;
+
+document.getElementById('pwdInput').onkeydown = e => {
+  if (e.key === 'Enter') doDelete();
+};
+
+document.getElementById('adminModal').onclick = e => {
+  if (e.target === document.getElementById('adminModal')) closeModal();
+};
+
+document.getElementById('lightbox').onclick = e => {
+  if (e.target === document.getElementById('lightbox')) closeLb();
+};
+
+document.getElementById('lbClose').onclick = closeLb;
+
+document.getElementById('lbPrev').onclick = () => navigateLb(-1);
+
+document.getElementById('lbNext').onclick = () => navigateLb(1);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('lightbox').classList.contains('show')) closeLb();
+    if (document.getElementById('adminModal').classList.contains('show')) closeModal();
+  }
+  if (e.key === 'ArrowLeft' && document.getElementById('lightbox').classList.contains('show')) navigateLb(-1);
+  if (e.key === 'ArrowRight' && document.getElementById('lightbox').classList.contains('show')) navigateLb(1);
+});
+
+// Category click handler
+document.getElementById('catList').onclick = e => {
+  if (e.target.classList.contains('cat-item')) {
+    document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
+    e.target.classList.add('active');
+    cat = e.target.dataset.c;
+    window.location.hash = encodeURIComponent(cat);
     applyFilters();
-  }, 80);  // debounce 80ms
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 };
 
 // ═══ START ═══

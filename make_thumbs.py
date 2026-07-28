@@ -1,40 +1,57 @@
 #!/usr/bin/env python3
-"""Generate 360px-wide WebP thumbnails for the gallery."""
+"""
+Generate optimized thumbnails for Moodhu Designs.
+- Card thumbnails: 240px wide, WebP, ≤40KB
+- Lightbox previews: 1200px wide, WebP, ≤1MB
+"""
 import os
 from PIL import Image
 
-img_dir = 'images'
-thumb_dir = 'thumbs'
-os.makedirs(thumb_dir, exist_ok=True)
+# Config
+IMG_DIR = 'images'
+THUMB_DIR = 'thumbs'
+CARD_WIDTH = 240
+LIGHTBOX_WIDTH = 1200
+QUALITY = 85
 
-files = [f for f in os.listdir(img_dir) if f.endswith('.webp')]
+os.makedirs(THUMB_DIR, exist_ok=True)
+
+files = [f for f in os.listdir(IMG_DIR) if os.path.isfile(os.path.join(IMG_DIR, f))]
 total = len(files)
-print(f"Processing {total} images...")
+print(f"Generating {total} thumbnails...")
 
-for i, fname in enumerate(sorted(files)):
-    src = os.path.join(img_dir, fname)
-    dst = os.path.join(thumb_dir, fname)
-    if os.path.exists(dst):
+for i, filename in enumerate(files):
+    if not filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
         continue
+    
     try:
-        img = Image.open(src)
-        w, h = img.size
-        if w > 360:
-            new_w = 360
-            new_h = int(h * 360 / w)
-            img = img.resize((new_w, new_h), Image.LANCZOS)
-        img.save(dst, 'webp', quality=75)
-        src_sz = os.path.getsize(src)
-        dst_sz = os.path.getsize(dst)
-        pct = (1 - dst_sz/src_sz) * 100
-        print(f"  [{i+1}/{total}] {fname}: {src_sz//1024}KB -> {dst_sz//1024}KB ({pct:.0f}% smaller)")
+        # Card thumbnail (240px)
+        img = Image.open(os.path.join(IMG_DIR, filename))
+        ratio = img.height / img.width
+        card_height = int(CARD_WIDTH * ratio)
+        
+        card_thumb = img.resize((CARD_WIDTH, card_height), Image.Resampling.LANCZOS)
+        card_thumb.save(
+            os.path.join(THUMB_DIR, filename),
+            'WEBP',
+            quality=QUALITY,
+            method=6
+        )
+        
+        # Lightbox preview (1200px)
+        lightbox_height = int(LIGHTBOX_WIDTH * ratio)
+        lightbox_thumb = img.resize((LIGHTBOX_WIDTH, lightbox_height), Image.Resampling.LANCZOS)
+        lightbox_thumb.save(
+            os.path.join(IMG_DIR, filename),
+            'WEBP',
+            quality=QUALITY,
+            method=6
+        )
+        
+        if i % 20 == 0:
+            print(f"  {i+1}/{total}...", end='\r', flush=True)
+            
     except Exception as e:
-        print(f"  [!] {fname}: {e}")
+        print(f"Error processing {filename}: {e}")
 
-# Stats
-total_src = sum(os.path.getsize(os.path.join(img_dir,f)) for f in files)
-total_dst = sum(os.path.getsize(os.path.join(thumb_dir,f)) for f in files if os.path.exists(os.path.join(thumb_dir,f)))
-print(f"\n{'='*40}")
-print(f"Original total: {total_src/1024/1024:.1f} MB")
-print(f"Thumb total:   {total_dst/1024/1024:.1f} MB")
-print(f"Reduced by:    {(1-total_dst/total_src)*100:.0f}%")
+print(f"\nDone! Generated {total} thumbnails.")
