@@ -66,8 +66,37 @@ def save_votes(votes):
 async def get_designs():
     data = load_designs()
     deleted = load_deleted()
-    data["designs"] = [d for d in data["designs"] if d["id"] not in deleted]
-    data["total"] = len(data["designs"])
+    votes = load_votes()
+
+    # Aggregate votes
+    agg = {}
+    for vid, vlist in votes.items():
+        if isinstance(vlist, list):
+            for v in vlist:
+                did = v.get("design_id")
+                vt = v.get("vote_type", v.get("action"))
+                if did not in agg:
+                    agg[did] = {"likes": 0, "dislikes": 0}
+                if vt == "like":
+                    agg[did]["likes"] += 1
+                elif vt == "dislike":
+                    agg[did]["dislikes"] += 1
+
+    # Filter deleted and add computed votes
+    designs = []
+    for d in data["designs"]:
+        if d["id"] in deleted:
+            continue
+        v = agg.get(d["id"], {"likes": 0, "dislikes": 0})
+        d["votes"] = {
+            "likes": v["likes"],
+            "dislikes": v["dislikes"],
+            "net": v["likes"] - v["dislikes"]
+        }
+        designs.append(d)
+
+    data["designs"] = designs
+    data["total"] = len(designs)
     return data
 
 @app.get("/api/votes")

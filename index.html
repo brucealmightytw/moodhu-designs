@@ -391,14 +391,17 @@ header {
   height: 95vh;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 16px;
 }
 
 #lbImg {
   max-width: 90vw;
-  max-height: 92vh;
+  max-height: 82vh;
   object-fit: contain;
   transition: opacity 0.3s;
+  border-radius: 8px;
 }
 
 #lbTitle {
@@ -891,7 +894,6 @@ header {
       
       // Preload high-res image
       const highResImg = new Image();
-      highResImg.src = `images/${design.filename}`;
       highResImg.onload = () => {
         lbImg.style.opacity = 0;
         setTimeout(() => {
@@ -899,6 +901,11 @@ header {
           lbImg.style.opacity = 1;
         }, 200);
       };
+      highResImg.onerror = () => {
+        // Keep showing thumbnail if high-res fails
+        console.log('High-res image not available, using thumbnail');
+      };
+      highResImg.src = `images/${design.filename}`;
       
       // Preload next/prev images
       if (index > 0) {
