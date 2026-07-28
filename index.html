@@ -34,6 +34,7 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 a {
@@ -223,7 +224,7 @@ header {
 
 .top-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--gap);
 }
 
@@ -245,7 +246,7 @@ header {
   margin: 0 auto;
   padding: 0 24px 40px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--gap);
 }
 
@@ -270,6 +271,7 @@ header {
   display: flex;
   flex-direction: column;
   border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
 }
 
 .card.top {
@@ -356,11 +358,6 @@ header {
   color: #fff;
 }
 
-.card.top5 .card-rank {
-  background: rgba(58, 123, 213, 0.7);
-  color: #fff;
-}
-
 .card-body {
   padding: 12px 14px 14px;
   display: flex;
@@ -437,6 +434,12 @@ header {
   color: #ff453a;
 }
 
+.card-votes .btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .card-votes .btn.del {
   flex: 0 0 36px;
   padding: 0;
@@ -445,6 +448,39 @@ header {
 
 .card:hover .card-votes .btn.del {
   display: flex;
+}
+
+/* ═══ BACK TO TOP ═══ */
+.back-to-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.back-to-top:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.08);
 }
 
 /* ═══ EMPTY STATE ═══ */
@@ -785,6 +821,9 @@ header {
 </head>
 <body>
 
+<!-- BACK TO TOP -->
+<button class="back-to-top" id="backToTop" title="Back to top">↑</button>
+
 <!-- WELCOME MODAL -->
 <div class="modal" id="welcomeModal">
   <div class="modal-content">
@@ -965,6 +1004,19 @@ async function init() {
     
     applyFilters();
     
+    // Back to top button
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > window.innerHeight) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+    });
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
   } catch(e) {
     console.error('Init error:', e);
     toast('❌ Failed to load. Check connection.');
@@ -992,9 +1044,9 @@ function emojiFor(category) {
 
 function getTopCount() {
   const width = window.innerWidth;
-  if (width >= 1024) return 5; // Desktop
-  if (width >= 768) return 4;  // Tablet
-  return 4; // Mobile (min 3, but we use 4 for consistency)
+  if (width >= 1024) return 4; // Desktop: Top4
+  if (width >= 768) return 3;  // Tablet: Top3
+  return 2; // Mobile: Top2
 }
 
 function applyFilters() {
@@ -1017,22 +1069,22 @@ function applyFilters() {
   // Sort
   if (sort === 'likes') {
     items.sort((a, b) => {
-      const aVoted = myVotes[a.id] === 'like';
-      const bVoted = myVotes[b.id] === 'like';
+      const aVoted = myVotes[a.id]?.action === 'like';
+      const bVoted = myVotes[b.id]?.action === 'like';
       if (aVoted !== bVoted) return aVoted ? -1 : 1;
       return b.votes.likes - a.votes.likes;
     });
   } else if (sort === 'newest') {
     items.sort((a, b) => {
-      const aVoted = myVotes[a.id] === 'like';
-      const bVoted = myVotes[b.id] === 'like';
+      const aVoted = myVotes[a.id]?.action === 'like';
+      const bVoted = myVotes[b.id]?.action === 'like';
       if (aVoted !== bVoted) return aVoted ? -1 : 1;
       return (b.created_at || '').localeCompare(a.created_at || '');
     });
   } else {
     items.sort((a, b) => {
-      const aVoted = myVotes[a.id] === 'like';
-      const bVoted = myVotes[b.id] === 'like';
+      const aVoted = myVotes[a.id]?.action === 'like';
+      const bVoted = myVotes[b.id]?.action === 'like';
       if (aVoted !== bVoted) return aVoted ? -1 : 1;
       return b.votes.net - a.votes.net;
     });
@@ -1056,15 +1108,16 @@ function render() {
     tg.innerHTML = topDesigns.map((d, i) => {
       const mv = myVotes[d.id];
       const v = d.votes;
+      const hasVoted = !!mv;
       return `
-        <div class="card top${i+1} ${mv === 'like' ? 'liked' : ''}" data-index="${filtered.indexOf(d)}">
+        <div class="card top${i+1} ${mv?.action === 'like' ? 'liked' : ''}" data-index="${filtered.indexOf(d)}">
           <div class="card-wrap" onclick="openLb(${filtered.indexOf(d)})">
             <div class="card-rank">${rankLabel(i+1)}</div>
             <img class="card-img" 
                  src="thumbs/${d.filename}" 
                  alt="${d.title}" 
                  loading="lazy" 
-                 fetchpriority="high" 
+                 fetchpriority="${i < 3 ? 'high' : 'low'}" 
                  onload="this.classList.add('loaded')" 
                  onerror="this.parentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:28px;opacity:.4>✕</div>'">
           </div>
@@ -1072,16 +1125,18 @@ function render() {
             <div class="card-cat">${d.category}</div>
             <div class="card-title">${d.title}</div>
             <div class="card-votes">
-              <button class="btn like${mv === 'like' ? ' active' : ''}" 
+              <button class="btn like${mv?.action === 'like' ? ' active' : ''}" 
                      data-vote-index="${filtered.indexOf(d)}" 
                      data-vote-type="like" 
-                     onclick="cast(${filtered.indexOf(d)}, 'like', this)">
+                     onclick="cast(${filtered.indexOf(d)}, 'like', this)" 
+                     ${hasVoted ? 'disabled' : ''}>
                 👍 ${v.likes || 0}
               </button>
-              <button class="btn dislike${mv === 'dislike' ? ' active' : ''}" 
+              <button class="btn dislike${mv?.action === 'dislike' ? ' active' : ''}" 
                      data-vote-index="${filtered.indexOf(d)}" 
                      data-vote-type="dislike" 
-                     onclick="cast(${filtered.indexOf(d)}, 'dislike', this)">
+                     onclick="cast(${filtered.indexOf(d)}, 'dislike', this)" 
+                     ${hasVoted ? 'disabled' : ''}>
                 👎 ${v.dislikes || 0}
               </button>
               <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
@@ -1102,11 +1157,12 @@ function render() {
     g.innerHTML = mainDesigns.map((d, i) => {
       const mv = myVotes[d.id];
       const v = d.votes;
-      const rank = filtered.indexOf(d) < 5 ? filtered.indexOf(d) + 1 : 0;
+      const rank = filtered.indexOf(d) + 1;
+      const hasVoted = !!mv;
       return `
-        <div class="card${rank ? ' top' + rank : ''} ${mv === 'like' ? 'liked' : ''}" data-index="${filtered.indexOf(d)}">
+        <div class="card${rank <= 5 ? ' top' + rank : ''} ${mv?.action === 'like' ? 'liked' : ''}" data-index="${filtered.indexOf(d)}">
           <div class="card-wrap" onclick="openLb(${filtered.indexOf(d)})">
-            ${rank ? `<div class="card-rank">${rankLabel(rank)}</div>` : ''}
+            ${rank <= 5 ? `<div class="card-rank">${rankLabel(rank)}</div>` : ''}
             <img class="card-img" 
                  src="thumbs/${d.filename}" 
                  alt="${d.title}" 
@@ -1118,16 +1174,18 @@ function render() {
             <div class="card-cat">${d.category}</div>
             <div class="card-title">${d.title}</div>
             <div class="card-votes">
-              <button class="btn like${mv === 'like' ? ' active' : ''}" 
+              <button class="btn like${mv?.action === 'like' ? ' active' : ''}" 
                      data-vote-index="${filtered.indexOf(d)}" 
                      data-vote-type="like" 
-                     onclick="cast(${filtered.indexOf(d)}, 'like', this)">
+                     onclick="cast(${filtered.indexOf(d)}, 'like', this)" 
+                     ${hasVoted ? 'disabled' : ''}>
                 👍 ${v.likes || 0}
               </button>
-              <button class="btn dislike${mv === 'dislike' ? ' active' : ''}" 
+              <button class="btn dislike${mv?.action === 'dislike' ? ' active' : ''}" 
                      data-vote-index="${filtered.indexOf(d)}" 
                      data-vote-type="dislike" 
-                     onclick="cast(${filtered.indexOf(d)}, 'dislike', this)">
+                     onclick="cast(${filtered.indexOf(d)}, 'dislike', this)" 
+                     ${hasVoted ? 'disabled' : ''}>
                 👎 ${v.dislikes || 0}
               </button>
               <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
@@ -1160,8 +1218,13 @@ async function cast(index, type, btn) {
   const d = filtered[index];
   if (!d) return;
   
+  // Check if already voted
+  if (myVotes[d.id]) {
+    toast('❌ You have already voted for this design');
+    return;
+  }
+  
   // Optimistic update
-  const prevVote = myVotes[d.id];
   const prevLikes = d.votes.likes;
   const prevDislikes = d.votes.dislikes;
   
@@ -1169,28 +1232,20 @@ async function cast(index, type, btn) {
   btn.classList.add('active');
   if (type === 'like') {
     d.votes.likes++;
-    if (prevVote === 'dislike') d.votes.dislikes--;
   } else {
     d.votes.dislikes++;
-    if (prevVote === 'like') d.votes.likes--;
   }
   d.votes.net = d.votes.likes - d.votes.dislikes;
-  myVotes[d.id] = type;
+  myVotes[d.id] = { action: type };
   
-  // Update the specific card
+  // Disable both buttons
   const card = document.querySelector(`.card[data-index="${index}"] .card-votes`);
   if (card) {
     card.innerHTML = `
-      <button class="btn like${type === 'like' ? ' active' : ''}" 
-             data-vote-index="${index}" 
-             data-vote-type="like" 
-             onclick="cast(${index}, 'like', this)">
+      <button class="btn like${type === 'like' ? ' active' : ''} disabled">
         👍 ${d.votes.likes}
       </button>
-      <button class="btn dislike${type === 'dislike' ? ' active' : ''}" 
-             data-vote-index="${index}" 
-             data-vote-type="dislike" 
-             onclick="cast(${index}, 'dislike', this)">
+      <button class="btn dislike${type === 'dislike' ? ' active' : ''} disabled">
         👎 ${d.votes.dislikes}
       </button>
       <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
@@ -1201,8 +1256,6 @@ async function cast(index, type, btn) {
   const cardEl = document.querySelector(`.card[data-index="${index}"]`);
   if (type === 'like') {
     cardEl.classList.add('liked');
-  } else if (prevVote === 'like') {
-    cardEl.classList.remove('liked');
   }
   
   // Async sync with server
@@ -1213,7 +1266,10 @@ async function cast(index, type, btn) {
       body: JSON.stringify({ design_id: d.id, action: type })
     });
     
-    if (!res.ok) throw new Error('Vote failed');
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.detail || 'Vote failed');
+    }
     
     // Re-sort and re-render if needed
     if (sort === 'votes' || sort === 'likes') {
@@ -1226,20 +1282,20 @@ async function cast(index, type, btn) {
     d.votes.likes = prevLikes;
     d.votes.dislikes = prevDislikes;
     d.votes.net = prevLikes - prevDislikes;
-    myVotes[d.id] = prevVote;
-    toast('❌ Vote failed. Try again.');
+    delete myVotes[d.id];
+    toast('❌ Vote failed: ' + e.message);
     
     // Re-render the card
     const card = document.querySelector(`.card[data-index="${index}"] .card-votes`);
     if (card) {
       card.innerHTML = `
-        <button class="btn like${prevVote === 'like' ? ' active' : ''}" 
+        <button class="btn like" 
                data-vote-index="${index}" 
                data-vote-type="like" 
                onclick="cast(${index}, 'like', this)">
           👍 ${prevLikes}
         </button>
-        <button class="btn dislike${prevVote === 'dislike' ? ' active' : ''}" 
+        <button class="btn dislike" 
                data-vote-index="${index}" 
                data-vote-type="dislike" 
                onclick="cast(${index}, 'dislike', this)">
@@ -1250,10 +1306,7 @@ async function cast(index, type, btn) {
     }
     
     // Revert liked status
-    const cardEl = document.querySelector(`.card[data-index="${index}"]`);
-    if (prevVote === 'like') {
-      cardEl.classList.add('liked');
-    } else {
+    if (type === 'like') {
       cardEl.classList.remove('liked');
     }
   }
