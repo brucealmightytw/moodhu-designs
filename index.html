@@ -201,7 +201,45 @@ header {
   font-weight: 500;
 }
 
-/* ═══ GALLERY ═══ */
+/* ═══ TOP DESIGNS SECTION ═══ */
+.top-section {
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 20px 24px 0;
+  background: #1d1d1f;
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+
+.top-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: var(--gold);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.top-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--gap);
+}
+
+@media (max-width: 1023px) {
+  .top-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .top-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ═══ MAIN GALLERY ═══ */
 .gallery {
   max-width: var(--w);
   margin: 0 auto;
@@ -209,7 +247,6 @@ header {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: var(--gap);
-  scroll-behavior: smooth;
 }
 
 @media (max-width: 1023px) {
@@ -235,33 +272,24 @@ header {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.card.top1,
-.card.top2,
-.card.top3,
-.card.top4,
-.card.top5 {
+.card.top {
   border: 2px solid var(--gold);
   box-shadow: 0 0 0 1px var(--gold), 0 4px 16px rgba(212, 175, 55, 0.2);
+  background: rgba(212, 175, 55, 0.05);
 }
 
-.card.top2 {
-  border-color: #c0c0c0;
-  box-shadow: 0 0 0 1px #c0c0c0, 0 4px 16px rgba(192, 192, 192, 0.2);
-}
-
-.card.top3 {
-  border-color: #cd7f32;
-  box-shadow: 0 0 0 1px #cd7f32, 0 4px 16px rgba(205, 127, 50, 0.2);
-}
-
-.card.top4 {
-  border-color: #e8616e;
-  box-shadow: 0 0 0 1px #e8616e, 0 4px 16px rgba(232, 97, 110, 0.2);
-}
-
-.card.top5 {
-  border-color: #3a7bd5;
-  box-shadow: 0 0 0 1px #3a7bd5, 0 4px 16px rgba(58, 123, 213, 0.2);
+.card.liked::before {
+  content: "❤️ I like this";
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(212, 175, 55, 0.9);
+  color: #0a0a0a;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  z-index: 10;
 }
 
 .card:hover {
@@ -305,6 +333,7 @@ header {
   letter-spacing: 0.02em;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  z-index: 5;
 }
 
 .card.top1 .card-rank {
@@ -765,7 +794,7 @@ header {
       <li>👍 Click <strong>Like</strong> to vote for your favorite designs</li>
       <li>👎 Click <strong>Dislike</strong> if you don't like it</li>
       <li>🔍 Use the search bar to find specific artworks</li>
-      <li>🏆 Top 5 designs are highlighted with gold borders</li>
+      <li>🏆 Top designs are highlighted in the special section</li>
     </ul>
     <button id="closeWelcome">Got it!</button>
   </div>
@@ -790,7 +819,7 @@ header {
 <!-- TOOLBAR -->
 <div class="toolbar">
   <select id="sortSelect">
-    <option value="votes">Top Rated</option>
+    <option value="votes">Top Rated (Likes - Dislikes)</option>
     <option value="likes">Most Liked</option>
     <option value="newest">Newest</option>
   </select>
@@ -801,7 +830,16 @@ header {
 <!-- CATEGORIES -->
 <div class="cat-scroll"><div class="cat-list" id="catList"></div></div>
 
-<!-- GALLERY -->
+<!-- TOP DESIGNS SECTION -->
+<div class="top-section">
+  <div class="top-header">
+    <span>🏆</span>
+    <span>Top Designs</span>
+  </div>
+  <div class="top-gallery" id="topGallery"></div>
+</div>
+
+<!-- MAIN GALLERY -->
 <div class="gallery" id="gallery"></div>
 
 <!-- ADMIN MODAL -->
@@ -840,11 +878,12 @@ const API_BASE = (() => {
   const l = window.location;
   return l.hostname === 'localhost' || l.hostname === '127.0.0.1' ? `http://${l.hostname}:8000` : l.origin;
 })();
-const ADMIN_PASSWORD = 'moodhu2024';
+const ADMIN_PASSWORD = 'moodhu';
 
 // ═══ STATE ═══
 let designs = [],
     filtered = [],
+    topDesigns = [],
     votes = {},
     myVotes = {},
     cat = 'all',
@@ -951,17 +990,11 @@ function emojiFor(category) {
   return '🖼️';
 }
 
-function rankOf(index) {
-  if (index === 0) return 1;
-  if (index === 1) return 2;
-  if (index === 2) return 3;
-  if (index === 3) return 4;
-  if (index === 4) return 5;
-  return 0;
-}
-
-function rankLabel(rank) {
-  return rank === 1 ? '🏆 NO.1' : rank === 2 ? '🥈 NO.2' : rank === 3 ? '🥉 NO.3' : rank === 4 ? 'NO.4' : rank === 5 ? 'NO.5' : '';
+function getTopCount() {
+  const width = window.innerWidth;
+  if (width >= 1024) return 5; // Desktop
+  if (width >= 768) return 4;  // Tablet
+  return 4; // Mobile (min 3, but we use 4 for consistency)
 }
 
 function applyFilters() {
@@ -983,68 +1016,136 @@ function applyFilters() {
   
   // Sort
   if (sort === 'likes') {
-    items.sort((a, b) => b.votes.likes - a.votes.likes);
+    items.sort((a, b) => {
+      const aVoted = myVotes[a.id] === 'like';
+      const bVoted = myVotes[b.id] === 'like';
+      if (aVoted !== bVoted) return aVoted ? -1 : 1;
+      return b.votes.likes - a.votes.likes;
+    });
   } else if (sort === 'newest') {
-    items.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+    items.sort((a, b) => {
+      const aVoted = myVotes[a.id] === 'like';
+      const bVoted = myVotes[b.id] === 'like';
+      if (aVoted !== bVoted) return aVoted ? -1 : 1;
+      return (b.created_at || '').localeCompare(a.created_at || '');
+    });
   } else {
-    items.sort((a, b) => b.votes.net - a.votes.net);
+    items.sort((a, b) => {
+      const aVoted = myVotes[a.id] === 'like';
+      const bVoted = myVotes[b.id] === 'like';
+      if (aVoted !== bVoted) return aVoted ? -1 : 1;
+      return b.votes.net - a.votes.net;
+    });
   }
   
   filtered = items;
+  
+  // Extract top designs
+  const topCount = getTopCount();
+  topDesigns = items.slice(0, topCount);
+  
   render();
 }
 
 function render() {
   const g = document.getElementById('gallery');
+  const tg = document.getElementById('topGallery');
   
-  if (!filtered.length) {
-    g.innerHTML = '<div class="empty">No designs found. Try a different search or category.</div>';
-    return;
-  }
-  
-  g.innerHTML = filtered.map((d, i) => {
-    const mv = myVotes[d.id];
-    const v = d.votes;
-    const rank = rankOf(i);
-    return `
-      <div class="card${rank ? ' top' + rank : ''}" data-index="${i}">
-        <div class="card-wrap" onclick="openLb(${i})">
-          ${rank ? `<div class="card-rank">${rankLabel(rank)}</div>` : ''}
-          <img class="card-img" 
-               src="thumbs/${d.filename}" 
-               alt="${d.title}" 
-               loading="lazy" 
-               fetchpriority="${i < 6 ? 'high' : 'low'}" 
-               onload="this.classList.add('loaded')" 
-               onerror="this.parentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:28px;opacity:.4>✕</div>'">
-        </div>
-        <div class="card-body">
-          <div class="card-cat">${d.category}</div>
-          <div class="card-title">${d.title}</div>
-          <div class="card-votes">
-            <button class="btn like${mv === 'like' ? ' active' : ''}" 
-                   data-vote-index="${i}" 
-                   data-vote-type="like" 
-                   onclick="cast(${i}, 'like', this)">
-              👍 ${v.likes || 0}
-            </button>
-            <button class="btn dislike${mv === 'dislike' ? ' active' : ''}" 
-                   data-vote-index="${i}" 
-                   data-vote-type="dislike" 
-                   onclick="cast(${i}, 'dislike', this)">
-              👎 ${v.dislikes || 0}
-            </button>
-            <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
+  // Render top designs
+  if (topDesigns.length) {
+    tg.innerHTML = topDesigns.map((d, i) => {
+      const mv = myVotes[d.id];
+      const v = d.votes;
+      return `
+        <div class="card top${i+1} ${mv === 'like' ? 'liked' : ''}" data-index="${filtered.indexOf(d)}">
+          <div class="card-wrap" onclick="openLb(${filtered.indexOf(d)})">
+            <div class="card-rank">${rankLabel(i+1)}</div>
+            <img class="card-img" 
+                 src="thumbs/${d.filename}" 
+                 alt="${d.title}" 
+                 loading="lazy" 
+                 fetchpriority="high" 
+                 onload="this.classList.add('loaded')" 
+                 onerror="this.parentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:28px;opacity:.4>✕</div>'">
+          </div>
+          <div class="card-body">
+            <div class="card-cat">${d.category}</div>
+            <div class="card-title">${d.title}</div>
+            <div class="card-votes">
+              <button class="btn like${mv === 'like' ? ' active' : ''}" 
+                     data-vote-index="${filtered.indexOf(d)}" 
+                     data-vote-type="like" 
+                     onclick="cast(${filtered.indexOf(d)}, 'like', this)">
+                👍 ${v.likes || 0}
+              </button>
+              <button class="btn dislike${mv === 'dislike' ? ' active' : ''}" 
+                     data-vote-index="${filtered.indexOf(d)}" 
+                     data-vote-type="dislike" 
+                     onclick="cast(${filtered.indexOf(d)}, 'dislike', this)">
+                👎 ${v.dislikes || 0}
+              </button>
+              <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
+            </div>
           </div>
         </div>
-      </div>
-    `;
-  }).join('');
+      `;
+    }).join('');
+  } else {
+    tg.innerHTML = '';
+  }
+  
+  // Render main gallery (exclude top designs)
+  const mainDesigns = filtered.filter(d => !topDesigns.includes(d));
+  if (!mainDesigns.length) {
+    g.innerHTML = '<div class="empty">No more designs found. Try a different search or category.</div>';
+  } else {
+    g.innerHTML = mainDesigns.map((d, i) => {
+      const mv = myVotes[d.id];
+      const v = d.votes;
+      const rank = filtered.indexOf(d) < 5 ? filtered.indexOf(d) + 1 : 0;
+      return `
+        <div class="card${rank ? ' top' + rank : ''} ${mv === 'like' ? 'liked' : ''}" data-index="${filtered.indexOf(d)}">
+          <div class="card-wrap" onclick="openLb(${filtered.indexOf(d)})">
+            ${rank ? `<div class="card-rank">${rankLabel(rank)}</div>` : ''}
+            <img class="card-img" 
+                 src="thumbs/${d.filename}" 
+                 alt="${d.title}" 
+                 loading="lazy" 
+                 onload="this.classList.add('loaded')" 
+                 onerror="this.parentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:28px;opacity:.4>✕</div>'">
+          </div>
+          <div class="card-body">
+            <div class="card-cat">${d.category}</div>
+            <div class="card-title">${d.title}</div>
+            <div class="card-votes">
+              <button class="btn like${mv === 'like' ? ' active' : ''}" 
+                     data-vote-index="${filtered.indexOf(d)}" 
+                     data-vote-type="like" 
+                     onclick="cast(${filtered.indexOf(d)}, 'like', this)">
+                👍 ${v.likes || 0}
+              </button>
+              <button class="btn dislike${mv === 'dislike' ? ' active' : ''}" 
+                     data-vote-index="${filtered.indexOf(d)}" 
+                     data-vote-type="dislike" 
+                     onclick="cast(${filtered.indexOf(d)}, 'dislike', this)">
+                👎 ${v.dislikes || 0}
+              </button>
+              <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
   
   document.getElementById('resultCount').textContent = 
     filtered.length < designs.length ? `${filtered.length} of ${designs.length}` : '';
   
   updateStats();
+}
+
+function rankLabel(rank) {
+  return rank === 1 ? '🏆 NO.1' : rank === 2 ? '🥈 NO.2' : rank === 3 ? '🥉 NO.3' : rank === 4 ? 'NO.4' : rank === 5 ? 'NO.5' : '';
 }
 
 function updateStats() {
@@ -1096,6 +1197,14 @@ async function cast(index, type, btn) {
     `;
   }
   
+  // Update liked status
+  const cardEl = document.querySelector(`.card[data-index="${index}"]`);
+  if (type === 'like') {
+    cardEl.classList.add('liked');
+  } else if (prevVote === 'like') {
+    cardEl.classList.remove('liked');
+  }
+  
   // Async sync with server
   try {
     const res = await fetch(`${API_BASE}/api/vote?voter_id=${VOTER_ID}`, {
@@ -1139,6 +1248,14 @@ async function cast(index, type, btn) {
         <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
       `;
     }
+    
+    // Revert liked status
+    const cardEl = document.querySelector(`.card[data-index="${index}"]`);
+    if (prevVote === 'like') {
+      cardEl.classList.add('liked');
+    } else {
+      cardEl.classList.remove('liked');
+    }
   }
 }
 
@@ -1153,8 +1270,8 @@ function openLb(index) {
   document.getElementById('lbImg').alt = d.title;
   document.getElementById('lbTitle').textContent = d.title;
   document.getElementById('lbCat').textContent = d.category;
-  const r = rankOf(index);
-  document.getElementById('lbRank').textContent = r ? ' · ' + rankLabel(r) : '';
+  const r = filtered.indexOf(d) + 1;
+  document.getElementById('lbRank').textContent = r <= 5 ? ' · ' + rankLabel(r) : '';
   
   document.getElementById('lightbox').classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -1296,6 +1413,11 @@ document.getElementById('catList').onclick = e => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 };
+
+// Handle window resize
+window.addEventListener('resize', () => {
+  applyFilters();
+});
 
 // ═══ START ═══
 init();
