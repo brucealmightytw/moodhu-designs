@@ -139,10 +139,12 @@ header {
 
 .categories {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 8px;
   scrollbar-width: none;
+  max-width: 100%;
 }
 
 .categories::-webkit-scrollbar {
@@ -300,6 +302,19 @@ header {
 .vote-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.delete-btn {
+  flex: 0 0 auto;
+  background: transparent;
+  color: var(--text3);
+  font-size: 14px;
+  padding: 6px 8px;
+}
+
+.delete-btn:hover {
+  color: #ff3b30;
+  background: rgba(255, 59, 48, 0.1);
 }
 
 /* ═══ LIGHTBOX ═══ */
@@ -685,7 +700,6 @@ header {
         const voted = myVotes[design.id];
         const likeVoted = voted === 'like';
         const dislikeVoted = voted === 'dislike';
-        const canVote = !voted;
 
         return `
           <div class="card ${isTop ? 'top' + (index + 1) : ''}" data-index="${designs.indexOf(design)}">
@@ -706,7 +720,6 @@ header {
                   class="vote-btn like ${likeVoted ? 'voted' : ''}"
                   data-vote-index="${designs.indexOf(design)}"
                   data-vote-type="like"
-                  ${!canVote ? 'disabled' : ''}
                 >
                   👍 ${design.votes.likes}
                 </button>
@@ -714,13 +727,18 @@ header {
                   class="vote-btn dislike ${dislikeVoted ? 'voted' : ''}"
                   data-vote-index="${designs.indexOf(design)}"
                   data-vote-type="dislike"
-                  ${!canVote ? 'disabled' : ''}
                 >
                   👎 ${design.votes.dislikes}
                 </button>
+                <button
+                  class="vote-btn delete-btn"
+                  data-index="${designs.indexOf(design)}"
+                  title="Delete (admin)"
+                >
+                  🗑️
+                </button>
               </div>
             </div>
-            ${likeVoted ? '<div class="voted-badge">❤️ I like this</div>' : ''}
           </div>
         `;
       }).join('');
@@ -735,7 +753,6 @@ header {
         const voted = myVotes[design.id];
         const likeVoted = voted === 'like';
         const dislikeVoted = voted === 'dislike';
-        const canVote = !voted;
 
         return `
           <div class="card top${index + 1}" data-index="${designs.indexOf(design)}">
@@ -757,7 +774,6 @@ header {
                   class="vote-btn like ${likeVoted ? 'voted' : ''}"
                   data-vote-index="${designs.indexOf(design)}"
                   data-vote-type="like"
-                  ${!canVote ? 'disabled' : ''}
                 >
                   👍 ${design.votes.likes}
                 </button>
@@ -765,13 +781,18 @@ header {
                   class="vote-btn dislike ${dislikeVoted ? 'voted' : ''}"
                   data-vote-index="${designs.indexOf(design)}"
                   data-vote-type="dislike"
-                  ${!canVote ? 'disabled' : ''}
                 >
                   👎 ${design.votes.dislikes}
                 </button>
+                <button
+                  class="vote-btn delete-btn"
+                  data-index="${designs.indexOf(design)}"
+                  title="Delete (admin)"
+                >
+                  🗑️
+                </button>
               </div>
             </div>
-            ${likeVoted ? '<div class="voted-badge">❤️ I like this</div>' : ''}
           </div>
         `;
       }).join('');
@@ -858,28 +879,32 @@ header {
       }
     }
 
-    // Cast vote
+    // Cast vote (toggle: same click removes vote, different click switches)
     async function cast(index, type, btn) {
       const design = designs[index];
       const prevType = myVotes[design.id];
       
+      // Determine new action
+      let action = null;
+      if (prevType === type) {
+        // Same vote — remove it (toggle off)
+        action = null;
+      } else {
+        // Different or new vote — apply it
+        action = type;
+      }
+      
       // Optimistic update
       if (prevType) {
-        // Remove previous vote
         design.votes[prevType + 's']--;
-        design.votes.net = design.votes.likes - design.votes.dislikes;
-      }
-      
-      // Add new vote
-      if (type) {
-        design.votes[type + 's']++;
-        design.votes.net = design.votes.likes - design.votes.dislikes;
-        myVotes[design.id] = type;
-      } else {
         delete myVotes[design.id];
       }
+      if (action) {
+        design.votes[action + 's']++;
+        myVotes[design.id] = action;
+      }
+      design.votes.net = design.votes.likes - design.votes.dislikes;
       
-      // Update UI
       applyFilters();
       renderStats();
       
@@ -889,7 +914,7 @@ header {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             design_id: design.id,
-            vote_type: type,
+            vote_type: action,
             voter_id: voterId
           })
         });
@@ -900,15 +925,15 @@ header {
       } catch (err) {
         console.error('Vote error:', err);
         // Revert on error
+        if (action) {
+          design.votes[action + 's']--;
+          delete myVotes[design.id];
+        }
         if (prevType) {
           design.votes[prevType + 's']++;
-        }
-        if (type) {
-          design.votes[type + 's']--;
+          myVotes[design.id] = prevType;
         }
         design.votes.net = design.votes.likes - design.votes.dislikes;
-        delete myVotes[design.id];
-        if (prevType) myVotes[design.id] = prevType;
         applyFilters();
         renderStats();
         alert('Vote failed. Please try again.');
@@ -1015,15 +1040,15 @@ header {
         if (e.target.classList.contains('vote-btn')) {
           const index = parseInt(e.target.dataset.voteIndex);
           const type = e.target.dataset.voteType;
-          cast(index, type, e.target);
+          if (type) {
+            cast(index, type, e.target);
+          }
         }
-      });
-
-      // Delete (event delegation)
-      document.addEventListener('contextmenu', e => {
-        if (e.target.closest('.card')) {
-          e.preventDefault();
-          const index = parseInt(e.target.closest('.card').dataset.index);
+        
+        // Delete button
+        if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
+          const btn = e.target.classList.contains('delete-btn') ? e.target : e.target.closest('.delete-btn');
+          const index = parseInt(btn.dataset.index);
           doDelete(index);
         }
       });

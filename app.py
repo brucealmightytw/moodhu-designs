@@ -134,15 +134,30 @@ async def cast_vote(request: Request):
     
     votes = load_votes()
     
-    # Check if already voted (only one vote per design per device)
+    # Check if already voted (allow changing vote)
+    existing_idx = None
     if voter_id in votes:
-        for v in votes[voter_id]:
+        for i, v in enumerate(votes[voter_id]):
             if v["design_id"] == design_id:
-                raise HTTPException(status_code=400, detail="Already voted")
-    else:
-        votes[voter_id] = []
+                existing_idx = i
+                break
     
-    # Record vote in array format (matches existing data structure)
+    if existing_idx is not None:
+        if votes[voter_id][existing_idx]["vote_type"] == action:
+            # Same vote — remove it (toggle off)
+            votes[voter_id].pop(existing_idx)
+            if not votes[voter_id]:
+                del votes[voter_id]
+            save_votes(votes)
+            return {"ok": True, "action": "removed"}
+        else:
+            # Different vote — update it
+            votes[voter_id][existing_idx]["vote_type"] = action
+            votes[voter_id][existing_idx]["created_at"] = str(uuid.uuid4())
+            save_votes(votes)
+            return {"ok": True, "action": "changed"}
+    
+    # Record new vote in array format
     import uuid
     votes[voter_id].append({
         "design_id": design_id,
