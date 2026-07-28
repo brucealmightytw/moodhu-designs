@@ -130,6 +130,10 @@ async def get_votes():
                 elif act == "dislike":
                     result[did]["dislikes"] += 1
     
+    # Add net to each design's votes
+    for did in result:
+        result[did]["net"] = result[did]["likes"] - result[did]["dislikes"]
+    
     return result
 
 @app.get("/api/votes/me")
