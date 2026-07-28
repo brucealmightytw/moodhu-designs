@@ -18,10 +18,6 @@ VOTES_FILE = DATA_DIR / "votes.json"
 ADMIN_PASSWORD = "moodhu"
 
 # Initialize data files
-if not DESIGNS_FILE.exists():
-    with open(DESIGNS_FILE, "w") as f:
-        json.dump({"designs": [], "total": 0}, f)
-
 if not DELETED_FILE.exists():
     with open(DELETED_FILE, "w") as f:
         json.dump([], f)
@@ -33,7 +29,17 @@ if not VOTES_FILE.exists():
 # Load data
 def load_designs():
     with open(DESIGNS_FILE, "r") as f:
-        return json.load(f)
+        data = json.load(f)
+    
+    # Convert old format (object) to new format (array)
+    if isinstance(data, dict) and "designs" not in data:
+        designs = []
+        for id, design in data.items():
+            design["id"] = id
+            designs.append(design)
+        return {"designs": designs, "total": len(designs)}
+    
+    return data
 
 def save_designs(data):
     with open(DESIGNS_FILE, "w") as f:
