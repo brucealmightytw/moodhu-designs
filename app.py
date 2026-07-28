@@ -126,6 +126,16 @@ async def cast_vote(request: Request):
     design_id = data.get("design_id")
     action = data.get("vote_type") or data.get("action")
     
+    # Handle explicit remove action
+    if action == 'remove':
+        votes = load_votes()
+        if voter_id in votes:
+            votes[voter_id] = [v for v in votes[voter_id] if v["design_id"] != design_id]
+            if not votes[voter_id]:
+                del votes[voter_id]
+            save_votes(votes)
+        return {"ok": True, "action": "removed"}
+    
     if not all([voter_id, design_id, action]):
         raise HTTPException(status_code=400, detail="Missing parameters")
     
@@ -159,6 +169,8 @@ async def cast_vote(request: Request):
     
     # Record new vote in array format
     import uuid
+    if voter_id not in votes:
+        votes[voter_id] = []
     votes[voter_id].append({
         "design_id": design_id,
         "vote_type": action,

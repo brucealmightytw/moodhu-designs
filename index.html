@@ -80,14 +80,15 @@ header {
 }
 
 .logo {
-  height: 32px;
+  height: 28px;
+  max-width: 100%;
   filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.5));
 }
 
 .stats {
   display: flex;
-  gap: 24px;
-  font-size: 14px;
+  gap: 16px;
+  font-size: 13px;
   color: var(--text2);
 }
 
@@ -135,6 +136,12 @@ header {
 
 .search-input::placeholder {
   color: var(--text3);
+}
+
+.categories-wrap {
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 0 24px;
 }
 
 .categories {
@@ -188,14 +195,53 @@ header {
 }
 
 @media (max-width: 1023px) {
+  .h-inner {
+    padding: 12px 16px;
+  }
   .top-gallery, .gallery {
     grid-template-columns: repeat(3, 1fr);
+  }
+  .gallery-container, .categories-wrap {
+    padding: 0 12px;
   }
 }
 
 @media (max-width: 767px) {
+  .logo {
+    height: 22px;
+  }
+  .h-inner {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .stats {
+    font-size: 12px;
+    gap: 8px;
+  }
   .top-gallery, .gallery {
     grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .gallery-container {
+    padding: 0 8px;
+  }
+  .filters {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cat-item {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+  .card-title {
+    font-size: 12px;
+  }
+  .vote-btn {
+    font-size: 11px;
+    padding: 5px;
+  }
+  #lbImg {
+    max-height: 85vh;
   }
 }
 
@@ -342,15 +388,15 @@ header {
 #lbContent {
   position: relative;
   max-width: 90vw;
-  max-height: 90vh;
+  height: 95vh;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 #lbImg {
-  max-width: 80vw;
-  max-height: 70vh;
+  max-width: 90vw;
+  max-height: 92vh;
   object-fit: contain;
   transition: opacity 0.3s;
 }
@@ -535,7 +581,9 @@ header {
     </div>
   </div>
 
-  <div class="categories" id="categories"></div>
+  <div class="categories-wrap">
+    <div class="categories" id="categories"></div>
+  </div>
 
   <div class="gallery-container">
     <h2 style="padding: 0 24px; margin-bottom: 16px;">🏆 Top Designs</h2>
@@ -909,14 +957,19 @@ header {
       renderStats();
       
       try {
+        const body = { voter_id: voterId };
+        if (action) {
+          body.design_id = design.id;
+          body.vote_type = action;
+        } else {
+          body.design_id = design.id;
+          body.action = 'remove';
+          body.vote_type = null;
+        }
         const res = await fetch(`${API_BASE}/api/vote`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            design_id: design.id,
-            vote_type: action,
-            voter_id: voterId
-          })
+          body: JSON.stringify(body)
         });
         
         if (!res.ok) {
