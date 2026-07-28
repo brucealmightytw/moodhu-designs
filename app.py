@@ -203,6 +203,8 @@ async def delete_design(request: Request):
 # Static files
 app.mount("/thumbs", StaticFiles(directory="thumbs"), name="thumbs")
 app.mount("/images", StaticFiles(directory="images"), name="images")
+# Serve root-level static files (logo.png, favicon, etc.) — must be last
+app.mount("/", StaticFiles(directory=".", html=True), name="root")
 
 @app.get("/")
 async def serve_index():
