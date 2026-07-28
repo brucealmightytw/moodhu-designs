@@ -6,3 +6,5 @@ votes.db
 data/
 public/
 brand-colors.jpg
+deleted_ids.json
+votes.json

@@ -10,7 +10,7 @@ from typing import Dict, Any
 app = FastAPI()
 
 # Config
-DATA_DIR = Path("data")
+DATA_DIR = Path(".")
 DATA_DIR.mkdir(exist_ok=True)
 DESIGNS_FILE = DATA_DIR / "designs.json"
 DELETED_FILE = DATA_DIR / "deleted_ids.json"
