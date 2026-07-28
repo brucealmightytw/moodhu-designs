@@ -752,7 +752,7 @@ header {
         const dislikeVoted = voted === 'dislike';
 
         return `
-          <div class="card ${isTop ? 'top' + (index + 1) : ''}" data-index="${designs.indexOf(design)}">
+          <div class="card ${isTop ? 'top' + (index + 1) : ''}" data-index="${index}" data-design-id="${design.id}">
             <div class="card-img-container">
               <img
                 src="thumbs/${design.filename}"
@@ -760,7 +760,7 @@ header {
                 class="card-img"
                 loading="lazy"
                 onload="this.classList.add('loaded')"
-                onclick="openLb(${designs.indexOf(design)})"
+                onclick="openLbById('${design.id}')"
               >
             </div>
             <div class="card-info">
@@ -768,21 +768,24 @@ header {
               <div class="card-votes">
                 <button
                   class="vote-btn like ${likeVoted ? 'voted' : ''}"
-                  data-vote-index="${designs.indexOf(design)}"
+                  data-vote-index="${index}"
                   data-vote-type="like"
+                  data-design-id="${design.id}"
                 >
                   👍 ${design.votes.likes}
                 </button>
                 <button
                   class="vote-btn dislike ${dislikeVoted ? 'voted' : ''}"
-                  data-vote-index="${designs.indexOf(design)}"
+                  data-vote-index="${index}"
                   data-vote-type="dislike"
+                  data-design-id="${design.id}"
                 >
                   👎 ${design.votes.dislikes}
                 </button>
                 <button
                   class="vote-btn delete-btn"
-                  data-index="${designs.indexOf(design)}"
+                  data-index="${index}"
+                  data-design-id="${design.id}"
                   title="Delete (admin)"
                 >
                   🗑️
@@ -805,7 +808,7 @@ header {
         const dislikeVoted = voted === 'dislike';
 
         return `
-          <div class="card top${index + 1}" data-index="${designs.indexOf(design)}">
+          <div class="card top${index + 1}" data-index="${index}" data-design-id="${design.id}">
             <div class="card-img-container">
               <img
                 src="thumbs/${design.filename}"
@@ -814,7 +817,7 @@ header {
                 loading="eager"
                 fetchpriority="high"
                 onload="this.classList.add('loaded')"
-                onclick="openLb(${designs.indexOf(design)})"
+                onclick="openLbById('${design.id}')"
               >
             </div>
             <div class="card-info">
@@ -822,21 +825,24 @@ header {
               <div class="card-votes">
                 <button
                   class="vote-btn like ${likeVoted ? 'voted' : ''}"
-                  data-vote-index="${designs.indexOf(design)}"
+                  data-vote-index="${index}"
                   data-vote-type="like"
+                  data-design-id="${design.id}"
                 >
                   👍 ${design.votes.likes}
                 </button>
                 <button
                   class="vote-btn dislike ${dislikeVoted ? 'voted' : ''}"
-                  data-vote-index="${designs.indexOf(design)}"
+                  data-vote-index="${index}"
                   data-vote-type="dislike"
+                  data-design-id="${design.id}"
                 >
                   👎 ${design.votes.dislikes}
                 </button>
                 <button
                   class="vote-btn delete-btn"
-                  data-index="${designs.indexOf(design)}"
+                  data-index="${index}"
+                  data-design-id="${design.id}"
                   title="Delete (admin)"
                 >
                   🗑️
@@ -884,6 +890,11 @@ header {
     }
 
     // Open lightbox
+    function openLbById(designId) {
+      const index = designs.findIndex(d => d.id === designId);
+      if (index >= 0) openLb(index);
+    }
+
     function openLb(index) {
       lbIdx = index;
       const design = designs[index];
@@ -935,7 +946,14 @@ header {
 
     // Cast vote (toggle: same click removes vote, different click switches)
     async function cast(index, type, btn) {
-      const design = designs[index];
+      // Find design by data-design-id if available, otherwise by index
+      let design;
+      if (btn && btn.dataset && btn.dataset.designId) {
+        design = designs.find(d => d.id === btn.dataset.designId);
+      } else {
+        design = filtered[index];
+      }
+      if (!design) return;
       const prevType = myVotes[design.id];
       
       // Determine new action
@@ -999,7 +1017,20 @@ header {
       }
     }
 
+    // Cast vote by design ID
+    async function castById(designId, type, btn) {
+      const design = designs.find(d => d.id === designId);
+      if (!design) return;
+      const index = designs.indexOf(design);
+      await cast(index, type, btn);
+    }
+
     // Delete design
+    async function doDeleteById(designId) {
+      const index = designs.findIndex(d => d.id === designId);
+      if (index >= 0) await doDelete(index);
+    }
+
     async function doDelete(index) {
       const design = designs[index];
       const password = prompt('Enter admin password:');
@@ -1097,18 +1128,18 @@ header {
       // Votes (event delegation)
       document.addEventListener('click', e => {
         if (e.target.classList.contains('vote-btn')) {
-          const index = parseInt(e.target.dataset.voteIndex);
           const type = e.target.dataset.voteType;
+          const designId = e.target.dataset.designId;
           if (type) {
-            cast(index, type, e.target);
+            castById(designId, type, e.target);
           }
         }
         
         // Delete button
         if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
           const btn = e.target.classList.contains('delete-btn') ? e.target : e.target.closest('.delete-btn');
-          const index = parseInt(btn.dataset.index);
-          doDelete(index);
+          const designId = btn.dataset.designId;
+          if (designId) doDeleteById(designId);
         }
       });
 
