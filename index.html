@@ -572,10 +572,10 @@ header {
 
   <div class="filters">
     <select id="sortSelect" class="sort-select">
-      <option value="votes">Top Rated (Likes - Dislikes)</option>
-      <option value="likes">Most Liked</option>
-      <option value="newest">Newest</option>
-    </select>
+          <option value="votes">Top Rated</option>
+          <option value="mylikes">What I liked</option>
+          <option value="newest">Default</option>
+        </select>
     <div class="search-box">
       <input type="text" id="searchInput" class="search-input" placeholder="Search designs...">
     </div>
@@ -725,15 +725,14 @@ header {
 
       // Sort
       filtered.sort((a, b) => {
-        // User voted designs first
-        const aVoted = myVotes[a.id] === 'like';
-        const bVoted = myVotes[b.id] === 'like';
-        if (aVoted !== bVoted) return aVoted ? -1 : 1;
-
-        // Then by sort criteria
-        if (sort === 'likes') return b.votes.likes - a.votes.likes;
-        if (sort === 'newest') return designs.indexOf(b) - designs.indexOf(a);
-        return b.votes.net - a.votes.net; // votes (default)
+        if (sort === 'mylikes') {
+          // User voted designs first
+          const aVoted = myVotes[a.id] === 'like';
+          const bVoted = myVotes[b.id] === 'like';
+          if (aVoted !== bVoted) return aVoted ? -1 : 1;
+        }
+        if (sort === 'newest') return designs.indexOf(b) - designs.indexOf(a); // Default: original order
+        return b.votes.net - a.votes.net; // Top Rated (votes)
       });
 
       // Render

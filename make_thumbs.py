@@ -12,7 +12,7 @@ IMG_DIR = 'images'
 THUMB_DIR = 'thumbs'
 CARD_WIDTH = 240
 LIGHTBOX_WIDTH = 1200
-QUALITY = 85
+QUALITY = 65
 
 os.makedirs(THUMB_DIR, exist_ok=True)
 
