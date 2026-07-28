@@ -75,31 +75,56 @@ async def get_votes():
     designs = load_designs()["designs"]
     votes = load_votes()
     
-    # Aggregate votes
+    # Aggregate votes (handle both old array format and new dict format)
     result = {}
     for d in designs:
         result[d["id"]] = {"likes": 0, "dislikes": 0}
     
-    for vote in votes.values():
-        if vote["design_id"] in result:
-            if vote["action"] == "like":
-                result[vote["design_id"]]["likes"] += 1
-            else:
-                result[vote["design_id"]]["dislikes"] += 1
+    for voter_id, voter_votes in votes.items():
+        # Handle array format: {"voter_id": [{"design_id":..., "vote_type":...}]}
+        if isinstance(voter_votes, list):
+            for v in voter_votes:
+                did = v.get("design_id")
+                vt = v.get("vote_type", v.get("action"))
+                if did in result:
+                    if vt == "like":
+                        result[did]["likes"] += 1
+                    elif vt == "dislike":
+                        result[did]["dislikes"] += 1
+        # Handle dict format: {"vote_id": {"design_id":..., "action":...}}
+        elif isinstance(voter_votes, dict):
+            did = voter_votes.get("design_id")
+            act = voter_votes.get("action", voter_votes.get("vote_type"))
+            if did in result:
+                if act == "like":
+                    result[did]["likes"] += 1
+                elif act == "dislike":
+                    result[did]["dislikes"] += 1
     
     return result
 
 @app.get("/api/votes/me")
 async def get_my_votes(voter_id: str):
     votes = load_votes()
-    return {k: v for k, v in votes.items() if v["voter_id"] == voter_id}
+    result = {}
+    for vid, voter_votes in votes.items():
+        if vid != voter_id:
+            continue
+        # Handle array format
+        if isinstance(voter_votes, list):
+            for v in voter_votes:
+                result[v["design_id"]] = v.get("vote_type", v.get("action"))
+        # Handle dict format
+        elif isinstance(voter_votes, dict):
+            result[voter_votes.get("design_id")] = voter_votes.get("action", voter_votes.get("vote_type"))
+    return result
 
 @app.post("/api/vote")
 async def cast_vote(request: Request):
     data = await request.json()
-    voter_id = request.query_params.get("voter_id")
+    voter_id = data.get("voter_id") or request.query_params.get("voter_id")
     design_id = data.get("design_id")
-    action = data.get("action")
+    action = data.get("vote_type") or data.get("action")
     
     if not all([voter_id, design_id, action]):
         raise HTTPException(status_code=400, detail="Missing parameters")
@@ -109,19 +134,21 @@ async def cast_vote(request: Request):
     
     votes = load_votes()
     
-    # Check if already voted
-    for vote_id, vote in votes.items():
-        if vote["voter_id"] == voter_id and vote["design_id"] == design_id:
-            raise HTTPException(status_code=400, detail="Already voted")
+    # Check if already voted (only one vote per design per device)
+    if voter_id in votes:
+        for v in votes[voter_id]:
+            if v["design_id"] == design_id:
+                raise HTTPException(status_code=400, detail="Already voted")
+    else:
+        votes[voter_id] = []
     
-    # Record vote
-    vote_id = f"{voter_id}_{design_id}_{int(time.time())}"
-    votes[vote_id] = {
-        "voter_id": voter_id,
+    # Record vote in array format (matches existing data structure)
+    import uuid
+    votes[voter_id].append({
         "design_id": design_id,
-        "action": action,
-        "timestamp": int(time.time())
-    }
+        "vote_type": action,
+        "created_at": str(uuid.uuid4())
+    })
     
     save_votes(votes)
     return {"ok": True}

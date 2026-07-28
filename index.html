@@ -27,14 +27,16 @@
   box-sizing: border-box;
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
 body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+  min-height: 100vh;
 }
 
 a {
@@ -42,12 +44,27 @@ a {
   text-decoration: none;
 }
 
-/* ═══ HEADER ═══ */
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ═══ LAYOUT ═══ */
 header {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(26, 26, 28, 0.92);
+  background: rgba(22, 22, 23, 0.88);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -56,144 +73,96 @@ header {
 .h-inner {
   max-width: var(--w);
   margin: 0 auto;
-  padding: 12px 24px;
+  padding: 16px 24px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
 }
 
 .logo {
   height: 32px;
-  width: auto;
-  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.2));
+  filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.5));
 }
 
-.h-right {
-  margin-left: auto;
+.stats {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 13px;
-  color: var(--text3);
-}
-
-.h-stats {
+  gap: 24px;
+  font-size: 14px;
   color: var(--text2);
 }
 
-.h-stats b {
-  color: var(--text);
-  font-weight: 500;
-}
-
-/* ═══ HERO ═══ */
-.hero {
-  max-width: var(--w);
-  margin: 0 auto;
-  padding: 40px 24px 20px;
-  text-align: center;
-}
-
-.hero h1 {
-  font-size: 56px;
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: -0.015em;
-  margin-bottom: 8px;
-}
-
-.hero p {
-  font-size: 21px;
-  color: var(--text2);
-  font-weight: 400;
-}
-
-/* ═══ TOOLBAR ═══ */
-.toolbar {
-  max-width: var(--w);
-  margin: 0 auto;
-  padding: 0 24px 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-#sortSelect {
-  padding: 8px 16px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-#sortSelect:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.t-search {
-  flex: 1;
-  min-width: 200px;
-  padding: 8px 16px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: var(--surface);
-  color: var(--text);
-  font-size: 14px;
-}
-
-.t-search::placeholder {
-  color: var(--text3);
-}
-
-.t-count {
-  font-size: 13px;
-  color: var(--text3);
-  white-space: nowrap;
-}
-
-/* ═══ CATEGORIES ═══ */
-.cat-scroll {
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  padding: 0 24px;
-  margin: 0 calc(-1 * var(--gap));
-}
-
-.cat-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.cat-list {
-  display: flex;
-  gap: 12px;
-  padding: 12px 0;
-  max-width: var(--w);
-  margin: 0 auto;
-}
-
-.cat-item {
-  padding: 8px 16px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text2);
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
+.stats span {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.cat-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+/* ═══ FILTERS ═══ */
+.filters {
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.sort-select {
+  background: var(--surface);
   color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.search-input::placeholder {
+  color: var(--text3);
+}
+
+.categories {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+}
+
+.categories::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-item {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cat-item:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .cat-item.active {
@@ -202,62 +171,28 @@ header {
   font-weight: 500;
 }
 
-/* ═══ TOP DESIGNS SECTION ═══ */
-.top-section {
+/* ═══ GALLERY ═══ */
+.gallery-container {
   max-width: var(--w);
   margin: 0 auto;
-  padding: 20px 24px 0;
-  background: #1d1d1f;
-  border-radius: var(--radius);
-  margin-bottom: 20px;
+  padding: 0 24px;
 }
 
-.top-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  color: var(--gold);
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.top-gallery {
+.top-gallery, .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--gap);
+  scroll-behavior: smooth;
 }
 
 @media (max-width: 1023px) {
-  .top-gallery {
+  .top-gallery, .gallery {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 767px) {
-  .top-gallery {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* ═══ MAIN GALLERY ═══ */
-.gallery {
-  max-width: var(--w);
-  margin: 0 auto;
-  padding: 0 24px 40px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--gap);
-}
-
-@media (max-width: 1023px) {
-  .gallery {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 767px) {
-  .gallery {
+  .top-gallery, .gallery {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -274,236 +209,231 @@ header {
   position: relative;
 }
 
-.card.top {
-  border: 2px solid var(--gold);
-  box-shadow: 0 0 0 1px var(--gold), 0 4px 16px rgba(212, 175, 55, 0.2);
-  background: rgba(212, 175, 55, 0.05);
-}
-
-.card.liked::before {
-  content: "❤️ I like this";
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(212, 175, 55, 0.9);
-  color: #0a0a0a;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  z-index: 10;
-}
-
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
-.card-wrap {
+.card.top1,
+.card.top2,
+.card.top3,
+.card.top4,
+.card.top5 {
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 4px 16px rgba(212, 175, 55, 0.2);
+}
+
+.card-img-container {
   position: relative;
-  aspect-ratio: 9/16;
+  flex: 1;
   overflow: hidden;
-  background: var(--surface2);
-  cursor: pointer;
 }
 
 .card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s, opacity 0.6s;
+  transition: opacity 0.3s;
   opacity: 0;
-  background: var(--surface2);
 }
 
 .card-img.loaded {
   opacity: 1;
 }
 
-.card:hover .card-img {
-  transform: scale(1.06);
-}
-
-.card-rank {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  padding: 3px 10px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 5;
-}
-
-.card.top1 .card-rank {
-  background: rgba(212, 175, 55, 0.85);
-  color: #0a0a0a;
-}
-
-.card.top2 .card-rank {
-  background: rgba(192, 192, 192, 0.8);
-  color: #0a0a0a;
-}
-
-.card.top3 .card-rank {
-  background: rgba(205, 127, 50, 0.8);
-  color: #fff;
-}
-
-.card.top4 .card-rank {
-  background: rgba(232, 97, 110, 0.7);
-  color: #fff;
-}
-
-.card-body {
-  padding: 12px 14px 14px;
+.card-info {
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  flex: 1;
-}
-
-.card-cat {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--gold);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 2px;
+  gap: 8px;
 }
 
 .card-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
-  color: var(--text);
-  line-height: 1.3;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 40px;
+  min-height: 36px;
 }
 
 .card-votes {
-  margin-top: 8px;
   display: flex;
-  gap: 4px;
+  gap: 8px;
+  margin-top: auto;
 }
 
-.card-votes .btn {
+.vote-btn {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 7px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: transparent;
-  color: var(--text2);
-  font-size: 13px;
-  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 12px;
   transition: all 0.2s;
-  min-height: 36px;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  transform: translateZ(0);
-  will-change: transform;
 }
 
-.card-votes .btn:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.card-votes .btn:active {
-  transform: scale(0.94);
-}
-
-.card-votes .btn.like.active {
-  background: rgba(52, 199, 89, 0.2);
-  border-color: #34c759;
+.vote-btn.like {
+  background: rgba(52, 199, 89, 0.1);
   color: #34c759;
 }
 
-.card-votes .btn.dislike.active {
-  background: rgba(255, 69, 58, 0.15);
-  border-color: #ff453a;
-  color: #ff453a;
+.vote-btn.like.voted {
+  background: #34c759;
+  color: white;
 }
 
-.card-votes .btn.disabled {
+.vote-btn.dislike {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+}
+
+.vote-btn.dislike.voted {
+  background: #ff3b30;
+  color: white;
+}
+
+.vote-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  pointer-events: none;
 }
 
-.card-votes .btn.del {
-  flex: 0 0 36px;
-  padding: 0;
-  display: none;
-}
-
-.card:hover .card-votes .btn.del {
-  display: flex;
-}
-
-/* ═══ BACK TO TOP ═══ */
-.back-to-top {
+/* ═══ LIGHTBOX ═══ */
+#lightbox {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: none;
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  z-index: 1000;
   opacity: 0;
-  transition: all 0.3s;
-  z-index: 100;
   pointer-events: none;
+  transition: opacity 0.3s;
 }
 
-.back-to-top.visible {
+#lightbox.show {
   opacity: 1;
   pointer-events: all;
 }
 
-.back-to-top:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.08);
+#lbContent {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-/* ═══ EMPTY STATE ═══ */
-.empty {
-  grid-column: 1 / -1;
+#lbImg {
+  max-width: 80vw;
+  max-height: 70vh;
+  object-fit: contain;
+  transition: opacity 0.3s;
+}
+
+#lbTitle {
+  color: white;
+  font-size: 18px;
   text-align: center;
-  padding: 40px;
-  color: var(--text3);
-  font-size: 16px;
 }
 
-/* ═══ ADMIN MODAL ═══ */
+.lb-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.lb-nav:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+#lbPrev {
+  left: 16px;
+}
+
+#lbNext {
+  right: 16px;
+}
+
+#lbClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* ═══ BACK TO TOP ═══ */
+#backToTop {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--gold);
+  color: #0a0a0a;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  z-index: 999;
+}
+
+#backToTop.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+#backToTop:hover {
+  transform: scale(1.1);
+}
+
+/* ═══ WELCOME MODAL ═══ */
 .modal {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.8);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 300;
+  align-items: center;
+  z-index: 2000;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s;
@@ -514,966 +444,598 @@ header {
   pointer-events: all;
 }
 
-.modal-box {
+.modal-content {
   background: var(--surface);
+  border-radius: var(--radius);
   padding: 24px;
-  border-radius: var(--radius);
-  width: 320px;
-  max-width: 90vw;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
 }
 
-.modal h3 {
-  font-size: 18px;
+.modal h2 {
   margin-bottom: 16px;
-  color: var(--text);
+  color: var(--gold);
 }
 
-.modal input {
-  width: 100%;
-  padding: 12px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: var(--surface2);
-  color: var(--text);
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-
-.modal-err {
-  color: #ff453a;
-  font-size: 13px;
-  margin-bottom: 16px;
-  display: none;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.modal-actions button {
-  padding: 8px 16px;
-  border-radius: var(--radius);
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-cancel {
-  background: transparent;
-  color: var(--text2);
-}
-
-.btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.btn-del {
-  background: #ff453a;
-  color: #fff;
-}
-
-.btn-del:hover {
-  background: #e03e30;
-}
-
-/* ═══ LIGHTBOX ═══ */
-.lightbox {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-
-.lightbox.show {
-  opacity: 1;
-  pointer-events: all;
-}
-
-#lbImg {
-  max-width: 90vw;
-  max-height: 90vh;
-  object-fit: contain;
-  transition: opacity 0.4s;
-}
-
-.lb-info {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 32px;
-  padding: 20px 24px 28px;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  font-size: 14px;
-}
-
-.lb-info .lb-title {
-  color: var(--text);
-  font-weight: 500;
-}
-
-.lb-info .lb-cat {
-  color: var(--text2);
-  font-weight: 400;
-}
-
-.lb-close {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  color: #fff;
-  font-size: 22px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.lb-close:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.08);
-}
-
-.lb-nav {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(10px);
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.lightbox.show .lb-nav {
-  opacity: 1;
-  pointer-events: all;
-}
-
-.lb-nav:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(-50%) scale(1.08);
-}
-
-.lb-prev {
-  left: 20px;
-}
-
-.lb-next {
-  right: 20px;
-}
-
-@media (max-width: 768px) {
-  .lb-nav {
-    display: none;
-  }
-}
-
-/* ═══ TOAST ═══ */
-.toast {
-  position: fixed;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  padding: 12px 24px;
-  border-radius: 12px;
-  background: rgba(22, 22, 23, 0.95);
-  backdrop-filter: blur(16px);
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 500;
-  z-index: 400;
-  opacity: 0;
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  white-space: nowrap;
-}
-
-.toast.show {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* ═══ WELCOME MODAL ═══ */
-#welcomeModal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 500;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-
-#welcomeModal.show {
-  opacity: 1;
-  pointer-events: all;
-}
-
-#welcomeModal .modal-content {
-  background: var(--surface);
-  padding: 24px;
-  border-radius: var(--radius);
-  width: 360px;
-  max-width: 90vw;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-#welcomeModal h2 {
-  font-size: 20px;
-  margin-bottom: 16px;
-  color: var(--text);
-}
-
-#welcomeModal p {
-  color: var(--text2);
-  margin-bottom: 16px;
-}
-
-#welcomeModal ul {
-  margin-bottom: 20px;
+.modal ul {
+  text-align: left;
+  margin: 16px 0;
   padding-left: 20px;
 }
 
-#welcomeModal li {
-  color: var(--text2);
+.modal li {
   margin-bottom: 8px;
 }
 
-#welcomeModal li strong {
-  color: var(--text);
+/* ═══ LOADING ═══ */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: var(--text2);
 }
 
-#closeWelcome {
-  width: 100%;
-  padding: 12px;
-  border-radius: var(--radius);
-  border: none;
-  background: var(--gold);
-  color: #0a0a0a;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
+/* ═══ RESPONSIVE TOP GALLERY ═══ */
+@media (min-width: 1200px) {
+  .top-gallery {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
-#closeWelcome:hover {
-  background: #c8a84e;
+@media (max-width: 1199px) and (min-width: 768px) {
+  .top-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-/* ═══ KEYBOARD HINT ═══ */
-.kb-hint {
-  position: fixed;
-  bottom: 80px;
-  right: 24px;
-  font-size: 11px;
-  color: var(--text3);
-  z-index: 50;
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-@media (max-width: 768px) {
-  .kb-hint {
-    display: none;
+@media (max-width: 767px) {
+  .top-gallery {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>
 </head>
 <body>
+  <header>
+    <div class="h-inner">
+      <img src="logo.png" alt="Moodhu" class="logo">
+      <div class="stats">
+        <span>🎨 <span id="totalDesigns">0</span> designs</span>
+        <span>👍 <span id="totalLikes">0</span> likes</span>
+        <span>👎 <span id="totalDislikes">0</span> dislikes</span>
+      </div>
+    </div>
+  </header>
 
-<!-- BACK TO TOP -->
-<button class="back-to-top" id="backToTop" title="Back to top">↑</button>
-
-<!-- WELCOME MODAL -->
-<div class="modal" id="welcomeModal">
-  <div class="modal-content">
-    <h2>🌊 Welcome to Moodhu Designs</h2>
-    <p>This is an anonymous voting gallery for ocean-themed artworks.</p>
-    <ul>
-      <li>👍 Click <strong>Like</strong> to vote for your favorite designs</li>
-      <li>👎 Click <strong>Dislike</strong> if you don't like it</li>
-      <li>🔍 Use the search bar to find specific artworks</li>
-      <li>🏆 Top designs are highlighted in the special section</li>
-    </ul>
-    <button id="closeWelcome">Got it!</button>
-  </div>
-</div>
-
-<!-- HEADER -->
-<header>
-  <div class="h-inner">
-    <img src="logo.png" alt="Moodhu" class="logo">
-    <div class="h-right">
-      <span class="h-stats"><b id="hWorks">0</b> works · <b id="hVotes">0</b> votes</span>
+  <div class="filters">
+    <select id="sortSelect" class="sort-select">
+      <option value="votes">Top Rated (Likes - Dislikes)</option>
+      <option value="likes">Most Liked</option>
+      <option value="newest">Newest</option>
+    </select>
+    <div class="search-box">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search designs...">
     </div>
   </div>
-</header>
 
-<!-- HERO -->
-<div class="hero">
-  <h1>Ocean Art Gallery</h1>
-  <p><span id="heroTotal">0</span> unique designs inspired by the beauty of the Maldives</p>
-</div>
+  <div class="categories" id="categories"></div>
 
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <select id="sortSelect">
-    <option value="votes">Top Rated (Likes - Dislikes)</option>
-    <option value="likes">Most Liked</option>
-    <option value="newest">Newest</option>
-  </select>
-  <input class="t-search" id="searchInput" type="text" placeholder="Search designs…" autocomplete="off">
-  <span class="t-count" id="resultCount"></span>
-</div>
+  <div class="gallery-container">
+    <h2 style="padding: 0 24px; margin-bottom: 16px;">🏆 Top Designs</h2>
+    <div class="top-gallery" id="topGallery"></div>
 
-<!-- CATEGORIES -->
-<div class="cat-scroll"><div class="cat-list" id="catList"></div></div>
-
-<!-- TOP DESIGNS SECTION -->
-<div class="top-section">
-  <div class="top-header">
-    <span>🏆</span>
-    <span>Top Designs</span>
+    <h2 style="padding: 0 24px; margin: 32px 0 16px;">All Designs</h2>
+    <div class="gallery" id="gallery"></div>
   </div>
-  <div class="top-gallery" id="topGallery"></div>
-</div>
 
-<!-- MAIN GALLERY -->
-<div class="gallery" id="gallery"></div>
+  <div class="loading" id="loading">Loading designs...</div>
 
-<!-- ADMIN MODAL -->
-<div class="modal" id="adminModal">
-  <div class="modal-box">
-    <h3>🔑 Admin Access</h3>
-    <input type="password" id="pwdInput" placeholder="Enter password" autocomplete="off">
-    <div class="modal-err" id="pwdError">Wrong password</div>
-    <div class="modal-actions">
-      <button class="btn-cancel" id="btnCancel">Cancel</button>
-      <button class="btn-del" id="pwdConfirm">Delete</button>
+  <div id="lightbox">
+    <div id="lbContent">
+      <button id="lbClose">×</button>
+      <img id="lbImg" src="" alt="">
+      <div id="lbTitle"></div>
+      <button id="lbPrev" class="lb-nav">←</button>
+      <button id="lbNext" class="lb-nav">→</button>
     </div>
   </div>
-</div>
 
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox">
-  <button class="lb-close" id="lbClose">✕</button>
-  <button class="lb-nav lb-prev" id="lbPrev">‹</button>
-  <button class="lb-nav lb-next" id="lbNext">›</button>
-  <img id="lbImg" src="" alt="">
-  <div class="lb-info">
-    <span class="lb-title" id="lbTitle"></span>
-    <span class="lb-cat" id="lbCat"></span>
-    <span class="lb-cat" id="lbRank"></span>
+  <button id="backToTop" title="Back to top">↑</button>
+
+  <div class="modal" id="welcomeModal">
+    <div class="modal-content">
+      <h2>🌊 Welcome to Moodhu Designs</h2>
+      <p>This is an anonymous voting gallery for ocean-themed artworks.</p>
+      <ul>
+        <li>👍 Click <strong>Like</strong> to vote for your favorite designs</li>
+        <li>👎 Click <strong>Dislike</strong> if you don't like it</li>
+        <li>🔍 Use the search bar to find specific artworks</li>
+        <li>🏆 Top designs are highlighted with gold borders</li>
+        <li>🗑️ Admin can delete designs (password: <strong>moodhu</strong>)</li>
+      </ul>
+      <button id="closeWelcome">Got it!</button>
+    </div>
   </div>
-</div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-<div class="kb-hint">Esc to close · ← → to navigate</div>
+  <script>
+    // Config
+    const API_BASE = '';
+    const ADMIN_PASSWORD = 'moodhu';
+    const VOTER_ID_KEY = 'moodhu_voter_id';
+    const WELCOME_KEY = 'moodhu_welcome_shown';
 
-<script>
-// ═══ CONFIG ═══
-const API_BASE = (() => {
-  const l = window.location;
-  return l.hostname === 'localhost' || l.hostname === '127.0.0.1' ? `http://${l.hostname}:8000` : l.origin;
-})();
-const ADMIN_PASSWORD = 'moodhu';
+    // State
+    let designs = [];
+    let filtered = [];
+    let categories = [];
+    let cat = '';
+    let sort = 'votes';
+    let search = '';
+    let myVotes = {};
+    let lbIdx = null;
+    let voterId = localStorage.getItem(VOTER_ID_KEY) || crypto.randomUUID();
+    localStorage.setItem(VOTER_ID_KEY, voterId);
 
-// ═══ STATE ═══
-let designs = [],
-    filtered = [],
-    topDesigns = [],
-    votes = {},
-    myVotes = {},
-    cat = 'all',
-    sort = 'votes',
-    search = '',
-    deleteTarget = null,
-    lbIdx = null;
-
-const VOTER_ID = (() => {
-  let v = localStorage.getItem('mv');
-  if (!v) {
-    const s = navigator.userAgent + screen.width + screen.height + screen.colorDepth + navigator.language;
-    let h = 0;
-    for (let i = 0; i < s.length; i++) {
-      h = ((h << 5) - h) + s.charCodeAt(i);
-      h |= 0;
-    }
-    v = 'v_' + Math.abs(h).toString(36) + '_' + Date.now().toString(36);
-    localStorage.setItem('mv', v);
-  }
-  return v;
-})();
-
-// ═══ TOAST ═══
-let toastTimer;
-function toast(msg, type = '') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show ' + type;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
-}
-
-// ═══ INIT ═══
-async function init() {
-  try {
-    // Show welcome modal if first visit
-    if (!localStorage.getItem('welcomeShown')) {
-      document.getElementById('welcomeModal').classList.add('show');
-    }
-    
-    // Load designs
-    const designData = await fetch(`${API_BASE}/api/designs`).then(r => r.json());
-    designs = designData.designs || [];
-    
-    // Load votes
-    try {
-      const voteCounts = await fetch(`${API_BASE}/api/votes`).then(r => r.json());
-      designs.forEach(d => {
-        d.votes = voteCounts[d.id] || { likes: 0, dislikes: 0 };
-        d.votes.net = d.votes.likes - d.votes.dislikes;
-      });
-    } catch(e) {
-      designs.forEach(d => d.votes = { likes: 0, dislikes: 0, net: 0 });
-    }
-    
-    // Load my votes
-    try {
-      myVotes = await fetch(`${API_BASE}/api/votes/me?voter_id=${VOTER_ID}`).then(r => r.json());
-    } catch(e) {
-      myVotes = {};
-    }
-    
-    // Categories
-    const categories = [...new Set(designs.map(d => d.category))].sort();
-    document.getElementById('catList').innerHTML = `
-      <div class="cat-item active" data-c="all">All</div>
-      ${categories.map(c => `<div class="cat-item" data-c="${c}">${emojiFor(c)} ${c}</div>`).join('')}
-    `;
-    
-    // Restore category from hash
-    if (window.location.hash) {
-      const h = decodeURIComponent(window.location.hash.slice(1));
-      const el = document.querySelector(`.cat-item[data-c="${CSS.escape(h)}"]`);
-      if (el) {
-        el.click();
-      }
-    }
-    
-    applyFilters();
-    
-    // Back to top button
+    // DOM
+    const galleryEl = document.getElementById('gallery');
+    const topGalleryEl = document.getElementById('topGallery');
+    const categoriesEl = document.getElementById('categories');
+    const sortSelect = document.getElementById('sortSelect');
+    const searchInput = document.getElementById('searchInput');
+    const loadingEl = document.getElementById('loading');
+    const totalDesignsEl = document.getElementById('totalDesigns');
+    const totalLikesEl = document.getElementById('totalLikes');
+    const totalDislikesEl = document.getElementById('totalDislikes');
+    const lightbox = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lbImg');
+    const lbTitle = document.getElementById('lbTitle');
+    const lbPrev = document.getElementById('lbPrev');
+    const lbNext = document.getElementById('lbNext');
+    const lbClose = document.getElementById('lbClose');
     const backToTop = document.getElementById('backToTop');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > window.innerHeight) {
-        backToTop.classList.add('visible');
-      } else {
-        backToTop.classList.remove('visible');
+    const welcomeModal = document.getElementById('welcomeModal');
+    const closeWelcome = document.getElementById('closeWelcome');
+
+    // Initialize
+    async function init() {
+      try {
+        // Show loading
+        loadingEl.style.display = 'flex';
+        galleryEl.style.display = 'none';
+
+        // Load designs
+        const designRes = await fetch(`${API_BASE}/api/designs`);
+        const designData = await designRes.json();
+        designs = designData.designs;
+        totalDesignsEl.textContent = designData.total;
+
+        // Load votes
+        const voteRes = await fetch(`${API_BASE}/api/votes`);
+        const voteData = await voteRes.json();
+        designs.forEach(d => {
+          d.votes = voteData[d.id] || { likes: 0, dislikes: 0, net: 0 };
+        });
+
+        // Load my votes
+        const myVoteRes = await fetch(`${API_BASE}/api/votes/me?voter_id=${voterId}`);
+        myVotes = await myVoteRes.json();
+
+        // Extract categories
+        categories = [...new Set(designs.map(d => d.category))].sort();
+
+        // Render
+        applyFilters();
+        renderCategories();
+        renderStats();
+
+        // Hide loading
+        loadingEl.style.display = 'none';
+        galleryEl.style.display = 'grid';
+
+        // Show welcome modal if first visit
+        if (!localStorage.getItem(WELCOME_KEY)) {
+          welcomeModal.classList.add('show');
+        }
+
+        // Set up event listeners
+        setupEvents();
+
+        // Preload images
+        preloadImages();
+      } catch (err) {
+        console.error('Init error:', err);
+        loadingEl.textContent = 'Failed to load designs. Please refresh.';
       }
-    });
-    backToTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    
-  } catch(e) {
-    console.error('Init error:', e);
-    toast('❌ Failed to load. Check connection.');
-  }
-}
-
-function emojiFor(category) {
-  const map = {
-    'Clownfish': '🐠',
-    'Dolphin': '🐬',
-    'ReefShark': '🦈',
-    'Hammerhead': '🦈',
-    'NapoleonWrasse': '🐟',
-    'Manta': '🌊',
-    'Turtle': '🐢',
-    'Whale': '🐋',
-    'Coral': '🪸',
-    'Reference': '📐'
-  };
-  for (const [k, v] of Object.entries(map)) {
-    if (category.toLowerCase().includes(k.toLowerCase())) return v;
-  }
-  return '🖼️';
-}
-
-function getTopCount() {
-  const width = window.innerWidth;
-  if (width >= 1024) return 4; // Desktop: Top4
-  if (width >= 768) return 3;  // Tablet: Top3
-  return 2; // Mobile: Top2
-}
-
-function applyFilters() {
-  let items = [...designs];
-  
-  // Category
-  if (cat !== 'all') {
-    items = items.filter(d => d.category === cat);
-  }
-  
-  // Search
-  if (search) {
-    const q = search.toLowerCase();
-    items = items.filter(d => 
-      d.title.toLowerCase().includes(q) ||
-      d.category.toLowerCase().includes(q)
-    );
-  }
-  
-  // Sort
-  if (sort === 'likes') {
-    items.sort((a, b) => {
-      const aVoted = myVotes[a.id]?.action === 'like';
-      const bVoted = myVotes[b.id]?.action === 'like';
-      if (aVoted !== bVoted) return aVoted ? -1 : 1;
-      return b.votes.likes - a.votes.likes;
-    });
-  } else if (sort === 'newest') {
-    items.sort((a, b) => {
-      const aVoted = myVotes[a.id]?.action === 'like';
-      const bVoted = myVotes[b.id]?.action === 'like';
-      if (aVoted !== bVoted) return aVoted ? -1 : 1;
-      return (b.created_at || '').localeCompare(a.created_at || '');
-    });
-  } else {
-    items.sort((a, b) => {
-      const aVoted = myVotes[a.id]?.action === 'like';
-      const bVoted = myVotes[b.id]?.action === 'like';
-      if (aVoted !== bVoted) return aVoted ? -1 : 1;
-      return b.votes.net - a.votes.net;
-    });
-  }
-  
-  filtered = items;
-  
-  // Extract top designs
-  const topCount = getTopCount();
-  topDesigns = items.slice(0, topCount);
-  
-  render();
-}
-
-function render() {
-  const g = document.getElementById('gallery');
-  const tg = document.getElementById('topGallery');
-  
-  // Render top designs
-  if (topDesigns.length) {
-    tg.innerHTML = topDesigns.map((d, i) => {
-      const mv = myVotes[d.id];
-      const v = d.votes;
-      const hasVoted = !!mv;
-      return `
-        <div class="card top${i+1} ${mv?.action === 'like' ? 'liked' : ''}" data-index="${filtered.indexOf(d)}">
-          <div class="card-wrap" onclick="openLb(${filtered.indexOf(d)})">
-            <div class="card-rank">${rankLabel(i+1)}</div>
-            <img class="card-img" 
-                 src="thumbs/${d.filename}" 
-                 alt="${d.title}" 
-                 loading="lazy" 
-                 fetchpriority="${i < 3 ? 'high' : 'low'}" 
-                 onload="this.classList.add('loaded')" 
-                 onerror="this.parentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:28px;opacity:.4>✕</div>'">
-          </div>
-          <div class="card-body">
-            <div class="card-cat">${d.category}</div>
-            <div class="card-title">${d.title}</div>
-            <div class="card-votes">
-              <button class="btn like${mv?.action === 'like' ? ' active' : ''}" 
-                     data-vote-index="${filtered.indexOf(d)}" 
-                     data-vote-type="like" 
-                     onclick="cast(${filtered.indexOf(d)}, 'like', this)" 
-                     ${hasVoted ? 'disabled' : ''}>
-                👍 ${v.likes || 0}
-              </button>
-              <button class="btn dislike${mv?.action === 'dislike' ? ' active' : ''}" 
-                     data-vote-index="${filtered.indexOf(d)}" 
-                     data-vote-type="dislike" 
-                     onclick="cast(${filtered.indexOf(d)}, 'dislike', this)" 
-                     ${hasVoted ? 'disabled' : ''}>
-                👎 ${v.dislikes || 0}
-              </button>
-              <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  } else {
-    tg.innerHTML = '';
-  }
-  
-  // Render main gallery (exclude top designs)
-  const mainDesigns = filtered.filter(d => !topDesigns.includes(d));
-  if (!mainDesigns.length) {
-    g.innerHTML = '<div class="empty">No more designs found. Try a different search or category.</div>';
-  } else {
-    g.innerHTML = mainDesigns.map((d, i) => {
-      const mv = myVotes[d.id];
-      const v = d.votes;
-      const rank = filtered.indexOf(d) + 1;
-      const hasVoted = !!mv;
-      return `
-        <div class="card${rank <= 5 ? ' top' + rank : ''} ${mv?.action === 'like' ? 'liked' : ''}" data-index="${filtered.indexOf(d)}">
-          <div class="card-wrap" onclick="openLb(${filtered.indexOf(d)})">
-            ${rank <= 5 ? `<div class="card-rank">${rankLabel(rank)}</div>` : ''}
-            <img class="card-img" 
-                 src="thumbs/${d.filename}" 
-                 alt="${d.title}" 
-                 loading="lazy" 
-                 onload="this.classList.add('loaded')" 
-                 onerror="this.parentElement.innerHTML='<div style=display:flex;align-items:center;justify-content:center;height:100%;color:#555;font-size:28px;opacity:.4>✕</div>'">
-          </div>
-          <div class="card-body">
-            <div class="card-cat">${d.category}</div>
-            <div class="card-title">${d.title}</div>
-            <div class="card-votes">
-              <button class="btn like${mv?.action === 'like' ? ' active' : ''}" 
-                     data-vote-index="${filtered.indexOf(d)}" 
-                     data-vote-type="like" 
-                     onclick="cast(${filtered.indexOf(d)}, 'like', this)" 
-                     ${hasVoted ? 'disabled' : ''}>
-                👍 ${v.likes || 0}
-              </button>
-              <button class="btn dislike${mv?.action === 'dislike' ? ' active' : ''}" 
-                     data-vote-index="${filtered.indexOf(d)}" 
-                     data-vote-type="dislike" 
-                     onclick="cast(${filtered.indexOf(d)}, 'dislike', this)" 
-                     ${hasVoted ? 'disabled' : ''}>
-                👎 ${v.dislikes || 0}
-              </button>
-              <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-  
-  document.getElementById('resultCount').textContent = 
-    filtered.length < designs.length ? `${filtered.length} of ${designs.length}` : '';
-  
-  updateStats();
-}
-
-function rankLabel(rank) {
-  return rank === 1 ? '🏆 NO.1' : rank === 2 ? '🥈 NO.2' : rank === 3 ? '🥉 NO.3' : rank === 4 ? 'NO.4' : rank === 5 ? 'NO.5' : '';
-}
-
-function updateStats() {
-  const totalVotes = designs.reduce((s, d) => s + d.votes.likes + d.votes.dislikes, 0);
-  document.getElementById('hWorks').textContent = designs.length;
-  document.getElementById('hVotes').textContent = totalVotes;
-  document.getElementById('heroTotal').textContent = designs.length;
-}
-
-// ═══ VOTE ═══
-async function cast(index, type, btn) {
-  const d = filtered[index];
-  if (!d) return;
-  
-  // Check if already voted
-  if (myVotes[d.id]) {
-    toast('❌ You have already voted for this design');
-    return;
-  }
-  
-  // Optimistic update
-  const prevLikes = d.votes.likes;
-  const prevDislikes = d.votes.dislikes;
-  
-  // Update UI immediately
-  btn.classList.add('active');
-  if (type === 'like') {
-    d.votes.likes++;
-  } else {
-    d.votes.dislikes++;
-  }
-  d.votes.net = d.votes.likes - d.votes.dislikes;
-  myVotes[d.id] = { action: type };
-  
-  // Disable both buttons
-  const card = document.querySelector(`.card[data-index="${index}"] .card-votes`);
-  if (card) {
-    card.innerHTML = `
-      <button class="btn like${type === 'like' ? ' active' : ''} disabled">
-        👍 ${d.votes.likes}
-      </button>
-      <button class="btn dislike${type === 'dislike' ? ' active' : ''} disabled">
-        👎 ${d.votes.dislikes}
-      </button>
-      <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
-    `;
-  }
-  
-  // Update liked status
-  const cardEl = document.querySelector(`.card[data-index="${index}"]`);
-  if (type === 'like') {
-    cardEl.classList.add('liked');
-  }
-  
-  // Async sync with server
-  try {
-    const res = await fetch(`${API_BASE}/api/vote?voter_id=${VOTER_ID}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ design_id: d.id, action: type })
-    });
-    
-    if (!res.ok) {
-      const data = await res.json();
-      throw new Error(data.detail || 'Vote failed');
     }
-    
-    // Re-sort and re-render if needed
-    if (sort === 'votes' || sort === 'likes') {
+
+    // Apply filters
+    function applyFilters() {
+      filtered = designs.filter(d => {
+        const matchesCat = !cat || d.category === cat;
+        const matchesSearch = !search || 
+          d.title.toLowerCase().includes(search.toLowerCase()) ||
+          d.category.toLowerCase().includes(search.toLowerCase());
+        return matchesCat && matchesSearch;
+      });
+
+      // Sort
+      filtered.sort((a, b) => {
+        // User voted designs first
+        const aVoted = myVotes[a.id] === 'like';
+        const bVoted = myVotes[b.id] === 'like';
+        if (aVoted !== bVoted) return aVoted ? -1 : 1;
+
+        // Then by sort criteria
+        if (sort === 'likes') return b.votes.likes - a.votes.likes;
+        if (sort === 'newest') return designs.indexOf(b) - designs.indexOf(a);
+        return b.votes.net - a.votes.net; // votes (default)
+      });
+
+      // Render
+      renderGallery();
+      renderTopGallery();
+    }
+
+    // Render gallery
+    function renderGallery() {
+      galleryEl.innerHTML = filtered.map((design, index) => {
+        const isTop = index < getTopCount();
+        const voted = myVotes[design.id];
+        const likeVoted = voted === 'like';
+        const dislikeVoted = voted === 'dislike';
+        const canVote = !voted;
+
+        return `
+          <div class="card ${isTop ? 'top' + (index + 1) : ''}" data-index="${designs.indexOf(design)}">
+            <div class="card-img-container">
+              <img
+                src="thumbs/${design.filename}"
+                alt="${design.title}"
+                class="card-img"
+                loading="lazy"
+                onload="this.classList.add('loaded')"
+                onclick="openLb(${designs.indexOf(design)})"
+              >
+            </div>
+            <div class="card-info">
+              <div class="card-title">${design.title}</div>
+              <div class="card-votes">
+                <button
+                  class="vote-btn like ${likeVoted ? 'voted' : ''}"
+                  data-vote-index="${designs.indexOf(design)}"
+                  data-vote-type="like"
+                  ${!canVote ? 'disabled' : ''}
+                >
+                  👍 ${design.votes.likes}
+                </button>
+                <button
+                  class="vote-btn dislike ${dislikeVoted ? 'voted' : ''}"
+                  data-vote-index="${designs.indexOf(design)}"
+                  data-vote-type="dislike"
+                  ${!canVote ? 'disabled' : ''}
+                >
+                  👎 ${design.votes.dislikes}
+                </button>
+              </div>
+            </div>
+            ${likeVoted ? '<div class="voted-badge">❤️ I like this</div>' : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render top gallery
+    function renderTopGallery() {
+      const topCount = getTopCount();
+      const topDesigns = filtered.slice(0, topCount);
+
+      topGalleryEl.innerHTML = topDesigns.map((design, index) => {
+        const voted = myVotes[design.id];
+        const likeVoted = voted === 'like';
+        const dislikeVoted = voted === 'dislike';
+        const canVote = !voted;
+
+        return `
+          <div class="card top${index + 1}" data-index="${designs.indexOf(design)}">
+            <div class="card-img-container">
+              <img
+                src="thumbs/${design.filename}"
+                alt="${design.title}"
+                class="card-img"
+                loading="eager"
+                fetchpriority="high"
+                onload="this.classList.add('loaded')"
+                onclick="openLb(${designs.indexOf(design)})"
+              >
+            </div>
+            <div class="card-info">
+              <div class="card-title">${design.title}</div>
+              <div class="card-votes">
+                <button
+                  class="vote-btn like ${likeVoted ? 'voted' : ''}"
+                  data-vote-index="${designs.indexOf(design)}"
+                  data-vote-type="like"
+                  ${!canVote ? 'disabled' : ''}
+                >
+                  👍 ${design.votes.likes}
+                </button>
+                <button
+                  class="vote-btn dislike ${dislikeVoted ? 'voted' : ''}"
+                  data-vote-index="${designs.indexOf(design)}"
+                  data-vote-type="dislike"
+                  ${!canVote ? 'disabled' : ''}
+                >
+                  👎 ${design.votes.dislikes}
+                </button>
+              </div>
+            </div>
+            ${likeVoted ? '<div class="voted-badge">❤️ I like this</div>' : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Get top count based on screen width
+    function getTopCount() {
+      if (window.innerWidth >= 1200) return 4;
+      if (window.innerWidth >= 768) return 3;
+      return 2;
+    }
+
+    // Render categories
+    function renderCategories() {
+      categoriesEl.innerHTML = `
+        <div class="cat-item ${!cat ? 'active' : ''}" data-c="">All</div>
+        ${categories.map(c => `
+          <div class="cat-item ${cat === c ? 'active' : ''}" data-c="${c}">${c}</div>
+        `).join('')}
+      `;
+    }
+
+    // Render stats
+    function renderStats() {
+      const totalLikes = designs.reduce((sum, d) => sum + d.votes.likes, 0);
+      const totalDislikes = designs.reduce((sum, d) => sum + d.votes.dislikes, 0);
+      totalLikesEl.textContent = totalLikes;
+      totalDislikesEl.textContent = totalDislikes;
+    }
+
+    // Preload images
+    function preloadImages() {
+      // Preload top images
+      const topCount = getTopCount();
+      filtered.slice(0, topCount).forEach(design => {
+        const img = new Image();
+        img.src = `thumbs/${design.filename}`;
+      });
+    }
+
+    // Open lightbox
+    function openLb(index) {
+      lbIdx = index;
+      const design = designs[index];
+      lbImg.src = `thumbs/${design.filename}`;
+      lbTitle.textContent = design.title;
+      lightbox.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      
+      // Preload high-res image
+      const highResImg = new Image();
+      highResImg.src = `images/${design.filename}`;
+      highResImg.onload = () => {
+        lbImg.style.opacity = 0;
+        setTimeout(() => {
+          lbImg.src = highResImg.src;
+          lbImg.style.opacity = 1;
+        }, 200);
+      };
+      
+      // Preload next/prev images
+      if (index > 0) {
+        const prevImg = new Image();
+        prevImg.src = `thumbs/${designs[index - 1].filename}`;
+      }
+      if (index < designs.length - 1) {
+        const nextImg = new Image();
+        nextImg.src = `thumbs/${designs[index + 1].filename}`;
+      }
+    }
+
+    // Close lightbox
+    function closeLb() {
+      lightbox.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    // Navigate lightbox
+    function navigateLb(direction) {
+      if (direction === 'next' && lbIdx < designs.length - 1) {
+        openLb(lbIdx + 1);
+      } else if (direction === 'prev' && lbIdx > 0) {
+        openLb(lbIdx - 1);
+      }
+    }
+
+    // Cast vote
+    async function cast(index, type, btn) {
+      const design = designs[index];
+      const prevType = myVotes[design.id];
+      
+      // Optimistic update
+      if (prevType) {
+        // Remove previous vote
+        design.votes[prevType + 's']--;
+        design.votes.net = design.votes.likes - design.votes.dislikes;
+      }
+      
+      // Add new vote
+      if (type) {
+        design.votes[type + 's']++;
+        design.votes.net = design.votes.likes - design.votes.dislikes;
+        myVotes[design.id] = type;
+      } else {
+        delete myVotes[design.id];
+      }
+      
+      // Update UI
       applyFilters();
+      renderStats();
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/vote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            design_id: design.id,
+            vote_type: type,
+            voter_id: voterId
+          })
+        });
+        
+        if (!res.ok) {
+          throw new Error('Vote failed');
+        }
+      } catch (err) {
+        console.error('Vote error:', err);
+        // Revert on error
+        if (prevType) {
+          design.votes[prevType + 's']++;
+        }
+        if (type) {
+          design.votes[type + 's']--;
+        }
+        design.votes.net = design.votes.likes - design.votes.dislikes;
+        delete myVotes[design.id];
+        if (prevType) myVotes[design.id] = prevType;
+        applyFilters();
+        renderStats();
+        alert('Vote failed. Please try again.');
+      }
     }
-    
-  } catch(e) {
-    // Rollback on error
-    console.error('Vote error:', e);
-    d.votes.likes = prevLikes;
-    d.votes.dislikes = prevDislikes;
-    d.votes.net = prevLikes - prevDislikes;
-    delete myVotes[d.id];
-    toast('❌ Vote failed: ' + e.message);
-    
-    // Re-render the card
-    const card = document.querySelector(`.card[data-index="${index}"] .card-votes`);
-    if (card) {
-      card.innerHTML = `
-        <button class="btn like" 
-               data-vote-index="${index}" 
-               data-vote-type="like" 
-               onclick="cast(${index}, 'like', this)">
-          👍 ${prevLikes}
-        </button>
-        <button class="btn dislike" 
-               data-vote-index="${index}" 
-               data-vote-type="dislike" 
-               onclick="cast(${index}, 'dislike', this)">
-          👎 ${prevDislikes}
-        </button>
-        <button class="btn del" onclick="openModal('${d.id}')" title="Delete">🗑️</button>
-      `;
+
+    // Delete design
+    async function doDelete(index) {
+      const design = designs[index];
+      const password = prompt('Enter admin password:');
+      if (password !== ADMIN_PASSWORD) {
+        alert('Wrong password');
+        return;
+      }
+      
+      if (!confirm(`Delete ${design.title}? This cannot be undone.`)) {
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/delete`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            design_id: design.id,
+            password: password
+          })
+        });
+        
+        if (!res.ok) {
+          throw new Error('Delete failed');
+        }
+        
+        // Remove from designs
+        designs = designs.filter(d => d.id !== design.id);
+        applyFilters();
+        renderStats();
+        alert('Design deleted permanently.');
+      } catch (err) {
+        console.error('Delete error:', err);
+        alert('Delete failed. Please try again.');
+      }
     }
-    
-    // Revert liked status
-    if (type === 'like') {
-      cardEl.classList.remove('liked');
+
+    // Setup event listeners
+    function setupEvents() {
+      // Sort change
+      sortSelect.addEventListener('change', () => {
+        sort = sortSelect.value;
+        applyFilters();
+      });
+
+      // Search
+      searchInput.addEventListener('input', () => {
+        search = searchInput.value;
+        applyFilters();
+      });
+
+      // Categories
+      categoriesEl.addEventListener('click', e => {
+        if (e.target.classList.contains('cat-item')) {
+          cat = e.target.dataset.c;
+          applyFilters();
+          renderCategories();
+          window.location.hash = cat;
+        }
+      });
+
+      // Lightbox
+      lbClose.addEventListener('click', closeLb);
+      lbPrev.addEventListener('click', () => navigateLb('prev'));
+      lbNext.addEventListener('click', () => navigateLb('next'));
+      lightbox.addEventListener('click', e => {
+        if (e.target === lightbox) closeLb();
+      });
+      document.addEventListener('keydown', e => {
+        if (lightbox.classList.contains('show')) {
+          if (e.key === 'Escape') closeLb();
+          if (e.key === 'ArrowLeft') navigateLb('prev');
+          if (e.key === 'ArrowRight') navigateLb('next');
+        }
+      });
+
+      // Back to top
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTop.classList.add('visible');
+        } else {
+          backToTop.classList.remove('visible');
+        }
+      });
+      backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // Welcome modal
+      closeWelcome.addEventListener('click', () => {
+        welcomeModal.classList.remove('show');
+        localStorage.setItem(WELCOME_KEY, '1');
+      });
+
+      // Votes (event delegation)
+      document.addEventListener('click', e => {
+        if (e.target.classList.contains('vote-btn')) {
+          const index = parseInt(e.target.dataset.voteIndex);
+          const type = e.target.dataset.voteType;
+          cast(index, type, e.target);
+        }
+      });
+
+      // Delete (event delegation)
+      document.addEventListener('contextmenu', e => {
+        if (e.target.closest('.card')) {
+          e.preventDefault();
+          const index = parseInt(e.target.closest('.card').dataset.index);
+          doDelete(index);
+        }
+      });
+
+      // Responsive top gallery
+      window.addEventListener('resize', () => {
+        renderTopGallery();
+      });
     }
-  }
-}
 
-// ═══ LIGHTBOX ═══
-function openLb(index) {
-  lbIdx = index;
-  const d = filtered[index];
-  if (!d) return;
-  
-  // Show thumbnail immediately
-  document.getElementById('lbImg').src = `thumbs/${d.filename}`;
-  document.getElementById('lbImg').alt = d.title;
-  document.getElementById('lbTitle').textContent = d.title;
-  document.getElementById('lbCat').textContent = d.category;
-  const r = filtered.indexOf(d) + 1;
-  document.getElementById('lbRank').textContent = r <= 5 ? ' · ' + rankLabel(r) : '';
-  
-  document.getElementById('lightbox').classList.add('show');
-  document.body.style.overflow = 'hidden';
-  
-  // Update nav visibility
-  document.getElementById('lbPrev').style.display = index > 0 ? '' : 'none';
-  document.getElementById('lbNext').style.display = index < filtered.length - 1 ? '' : 'none';
-  
-  // Preload high-res image
-  const img = new Image();
-  img.src = `images/${d.filename}`;
-  img.onload = () => {
-    document.getElementById('lbImg').style.opacity = 0;
-    setTimeout(() => {
-      document.getElementById('lbImg').src = img.src;
-      document.getElementById('lbImg').style.opacity = 1;
-    }, 200);
-  };
-  
-  // Preload next/prev images
-  if (index > 0) {
-    const prevImg = new Image();
-    prevImg.src = `images/${filtered[index - 1].filename}`;
-  }
-  if (index < filtered.length - 1) {
-    const nextImg = new Image();
-    nextImg.src = `images/${filtered[index + 1].filename}`;
-  }
-}
-
-function navigateLb(dir) {
-  const i = lbIdx + dir;
-  if (i < 0 || i >= filtered.length) return;
-  openLb(i);
-}
-
-function closeLb() {
-  document.getElementById('lightbox').classList.remove('show');
-  document.body.style.overflow = '';
-  lbIdx = null;
-}
-
-// ═══ ADMIN DELETE ═══
-async function doDelete() {
-  const pwd = document.getElementById('pwdInput').value;
-  if (pwd !== ADMIN_PASSWORD) {
-    document.getElementById('pwdError').style.display = 'block';
-    return;
-  }
-  
-  try {
-    const res = await fetch(`${API_BASE}/api/delete`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ design_id: deleteTarget, password: pwd })
-    });
-    
-    const data = await res.json();
-    if (res.ok && data.ok) {
-      toast('🗑️ Permanently deleted');
-      closeModal();
-      await init(); // Reload everything
-    } else {
-      toast('❌ Delete failed: ' + (data.message || 'Unknown error'));
-    }
-  } catch(e) {
-    toast('❌ Server error');
-  }
-}
-
-function openModal(id) {
-  deleteTarget = id;
-  document.getElementById('pwdInput').value = '';
-  document.getElementById('pwdError').style.display = 'none';
-  document.getElementById('adminModal').classList.add('show');
-  setTimeout(() => document.getElementById('pwdInput').focus(), 100);
-}
-
-function closeModal() {
-  document.getElementById('adminModal').classList.remove('show');
-  deleteTarget = null;
-}
-
-// ═══ EVENT LISTENERS ═══
-document.getElementById('closeWelcome').onclick = () => {
-  document.getElementById('welcomeModal').classList.remove('show');
-  localStorage.setItem('welcomeShown', '1');
-};
-
-document.getElementById('sortSelect').onchange = () => {
-  sort = document.getElementById('sortSelect').value;
-  applyFilters();
-};
-
-document.getElementById('searchInput').oninput = () => {
-  search = document.getElementById('searchInput').value.trim();
-  applyFilters();
-};
-
-document.getElementById('pwdConfirm').onclick = doDelete;
-
-document.getElementById('btnCancel').onclick = closeModal;
-
-document.getElementById('pwdInput').onkeydown = e => {
-  if (e.key === 'Enter') doDelete();
-};
-
-document.getElementById('adminModal').onclick = e => {
-  if (e.target === document.getElementById('adminModal')) closeModal();
-};
-
-document.getElementById('lightbox').onclick = e => {
-  if (e.target === document.getElementById('lightbox')) closeLb();
-};
-
-document.getElementById('lbClose').onclick = closeLb;
-
-document.getElementById('lbPrev').onclick = () => navigateLb(-1);
-
-document.getElementById('lbNext').onclick = () => navigateLb(1);
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    if (document.getElementById('lightbox').classList.contains('show')) closeLb();
-    if (document.getElementById('adminModal').classList.contains('show')) closeModal();
-  }
-  if (e.key === 'ArrowLeft' && document.getElementById('lightbox').classList.contains('show')) navigateLb(-1);
-  if (e.key === 'ArrowRight' && document.getElementById('lightbox').classList.contains('show')) navigateLb(1);
-});
-
-// Category click handler
-document.getElementById('catList').onclick = e => {
-  if (e.target.classList.contains('cat-item')) {
-    document.querySelectorAll('.cat-item').forEach(el => el.classList.remove('active'));
-    e.target.classList.add('active');
-    cat = e.target.dataset.c;
-    window.location.hash = encodeURIComponent(cat);
-    applyFilters();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-};
-
-// Handle window resize
-window.addEventListener('resize', () => {
-  applyFilters();
-});
-
-// ═══ START ═══
-init();
-</script>
+    // Initialize
+    init();
+  </script>
 </body>
 </html>
