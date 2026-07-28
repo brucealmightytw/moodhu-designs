@@ -95,6 +95,9 @@ async def get_designs():
         }
         designs.append(d)
 
+    # Sort by net votes descending (default ranking)
+    designs.sort(key=lambda x: x["votes"]["net"], reverse=True)
+    
     data["designs"] = designs
     data["total"] = len(designs)
     return data
