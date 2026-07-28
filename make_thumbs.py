@@ -10,9 +10,9 @@ from PIL import Image
 # Config
 IMG_DIR = 'images'
 THUMB_DIR = 'thumbs'
-CARD_WIDTH = 240
+CARD_WIDTH = 180
 LIGHTBOX_WIDTH = 1200
-QUALITY = 65
+QUALITY = 55
 
 os.makedirs(THUMB_DIR, exist_ok=True)
 

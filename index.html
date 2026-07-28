@@ -213,10 +213,14 @@ header {
   .h-inner {
     padding: 10px 12px;
     gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   .stats {
     font-size: 12px;
     gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   .top-gallery, .gallery {
     grid-template-columns: repeat(2, 1fr);
@@ -759,6 +763,7 @@ header {
                 alt="${design.title}"
                 class="card-img"
                 loading="lazy"
+                decoding="async"
                 onload="this.classList.add('loaded')"
                 onclick="openLbById('${design.id}')"
               >
@@ -816,6 +821,7 @@ header {
                 class="card-img"
                 loading="eager"
                 fetchpriority="high"
+                decoding="async"
                 onload="this.classList.add('loaded')"
                 onclick="openLbById('${design.id}')"
               >
@@ -999,6 +1005,8 @@ header {
         if (!res.ok) {
           throw new Error('Vote failed');
         }
+        // Re-apply filters to ensure correct ordering after API confirmation
+        applyFilters();
       } catch (err) {
         console.error('Vote error:', err);
         // Revert on error
