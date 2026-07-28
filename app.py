@@ -3,7 +3,6 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
@@ -205,9 +204,35 @@ def api_stats():
         "top_design_id": best_id
     }
 
-# ── 靜態檔案服務 ──
-# 掛載 images 資料夾（含快取 headers）
-app.mount("/images", StaticFiles(directory="images", check_dir=False), name="images")
+# ── 靜態檔案服務（含快取 headers） ──
+from fastapi.responses import FileResponse, JSONResponse, Response
+import time
+
+@app.get("/images/{path:path}")
+async def serve_image(path: str):
+    file = Path("images") / path
+    if file.exists() and file.is_file():
+        return FileResponse(str(file), headers={
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "Expires": time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(time.time() + 31536000))
+        })
+    return JSONResponse({"error": "Not found"}, status_code=404)
+
+@app.get("/thumbs/{path:path}")
+async def serve_thumb(path: str):
+    file = Path("thumbs") / path
+    if file.exists() and file.is_file():
+        return FileResponse(str(file), headers={
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "Expires": time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(time.time() + 31536000))
+        })
+    return JSONResponse({"error": "Not found"}, status_code=404)
+
+@app.get("/logo.png")
+async def logo():
+    return FileResponse("logo.png", headers={
+        "Cache-Control": "public, max-age=86400"
+    })
 
 # 前端靜態檔 (index.html, designs.json)
 @app.get("/")
