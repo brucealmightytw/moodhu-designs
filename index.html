@@ -633,7 +633,6 @@ header {
   <script>
     // Config
     const API_BASE = '';
-    const ADMIN_PASSWORD = 'moodhu';
     const VOTER_ID_KEY = 'moodhu_voter_id';
     const WELCOME_KEY = 'moodhu_welcome_shown';
 
@@ -1043,15 +1042,12 @@ header {
     async function doDelete(index) {
       const design = designs[index];
       const password = prompt('Enter admin password:');
-      if (password !== ADMIN_PASSWORD) {
-        alert('Wrong password');
-        return;
-      }
-      
+      if (!password) return;
+
       if (!confirm(`Delete ${design.title}? This cannot be undone.`)) {
         return;
       }
-      
+
       try {
         const res = await fetch(`${API_BASE}/api/delete`, {
           method: 'POST',
@@ -1061,7 +1057,11 @@ header {
             password: password
           })
         });
-        
+
+        if (res.status === 403) {
+          alert('Wrong password');
+          return;
+        }
         if (!res.ok) {
           throw new Error('Delete failed');
         }

@@ -5,6 +5,7 @@ from pathlib import Path
 import json
 import os
 import time
+import uuid
 from typing import Dict, Any
 
 app = FastAPI()
@@ -15,7 +16,7 @@ DATA_DIR.mkdir(exist_ok=True)
 DESIGNS_FILE = DATA_DIR / "designs.json"
 DELETED_FILE = DATA_DIR / "deleted_ids.json"
 VOTES_FILE = DATA_DIR / "votes.json"
-ADMIN_PASSWORD = "moodhu"
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "moodhu")
 
 # Initialize data files
 if not DELETED_FILE.exists():
@@ -204,7 +205,6 @@ async def cast_vote(request: Request):
             return {"ok": True, "action": "changed"}
     
     # Record new vote in array format
-    import uuid
     if voter_id not in votes:
         votes[voter_id] = []
     votes[voter_id].append({

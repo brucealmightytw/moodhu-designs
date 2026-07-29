@@ -14,7 +14,6 @@ DST = Path(r"E:\BaiduSyncdisk\Moodhu-Designs-Web")
 IMG_OUT = DST / "images"
 MAX_W = 1200
 QUALITY = 80
-ADMIN_PASSWORD = "moodhu2024"  # 管理員密碼，可自行修改
 
 os.makedirs(IMG_OUT, exist_ok=True)
 
@@ -86,7 +85,6 @@ for fpath in sorted(SRC.rglob("*")):
 data = {
     "designs": designs,
     "total": len(designs),
-    "admin_password": ADMIN_PASSWORD,
 }
 json_path = DST / "designs.json"
 with open(json_path, "w", encoding="utf-8") as f:
