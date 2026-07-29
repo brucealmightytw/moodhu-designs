@@ -34,7 +34,11 @@ html {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
-  background: var(--bg);
+  background:
+    radial-gradient(ellipse 1200px 800px at 15% -10%, rgba(11, 61, 79, 0.35), transparent 60%),
+    radial-gradient(ellipse 1000px 700px at 100% 20%, rgba(15, 45, 60, 0.25), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text);
   min-height: 100vh;
 }
@@ -301,15 +305,23 @@ header {
   gap: 8px;
 }
 
+.card-theme {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+}
+
 .card-title {
   font-size: 14px;
   font-weight: 500;
-  line-height: 1.4;
+  line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  min-height: 36px;
+  min-height: 19px;
 }
 
 .card-votes {
@@ -361,11 +373,23 @@ header {
   color: var(--text3);
   font-size: 14px;
   padding: 6px 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.card:hover .delete-btn,
+.card:focus-within .delete-btn {
+  opacity: 0.6;
 }
 
 .delete-btn:hover {
+  opacity: 1;
   color: #ff3b30;
   background: rgba(255, 59, 48, 0.1);
+}
+
+@media (hover: none) {
+  .delete-btn { opacity: 0.35; }
 }
 
 /* ═══ LIGHTBOX ═══ */
@@ -624,7 +648,6 @@ header {
         <li>👎 Click <strong>Dislike</strong> if you don't like it</li>
         <li>🔍 Use the search bar to find specific artworks</li>
         <li>🏆 Top designs are highlighted with gold borders</li>
-        <li>🗑️ Admin can delete designs (password: <strong>moodhu</strong>)</li>
       </ul>
       <button id="closeWelcome">Got it!</button>
     </div>
@@ -635,6 +658,33 @@ header {
     const API_BASE = '';
     const VOTER_ID_KEY = 'moodhu_voter_id';
     const WELCOME_KEY = 'moodhu_welcome_shown';
+
+    const THEME_EMOJIS = {
+      Clownfish: '🐠', Dolphin: '🐬', HammerheadShark: '🦈',
+      MandalaMantaWhaleShark: '🐋', MantaRay: '🐡', MantaWhaleShark: '🐋',
+      Mixed: '🎨', NapoleonWrasse: '🐟', ReefShark: '🦈', SeaTurtle: '🐢',
+      TigerShark: '🦈', TropicalFish: '🐠', WhaleShark: '🦈',
+      Uncategorized: '📦', _unsorted: '📦',
+    };
+    const themeEmoji = c => THEME_EMOJIS[c] || '🌊';
+
+    // Turn a raw filename-derived id ("Clownfish-AfremovOil-Wide-50x92") into a
+    // friendly display label ("Afremov Oil") — strips the leading theme prefix
+    // (shown separately via the category pill/emoji) and trailing size/version
+    // tags, then splits camelCase style codes into words.
+    const STOP_SEGMENT = /^(v?\d+|wide|narrow|\d+x\d+)$/i;
+    function friendlyStyle(design) {
+      let rest = design.title;
+      const prefix = design.category + '-';
+      if (rest.startsWith(prefix)) rest = rest.slice(prefix.length);
+      const kept = [];
+      for (const seg of rest.split('-')) {
+        if (STOP_SEGMENT.test(seg)) break;
+        kept.push(seg);
+      }
+      const label = kept.join(' ').replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/_/g, ' ').trim();
+      return label || design.title;
+    }
 
     // State
     let designs = [];
@@ -769,7 +819,8 @@ header {
               >
             </div>
             <div class="card-info">
-              <div class="card-title">${design.title}</div>
+              <div class="card-theme">${themeEmoji(design.category)} ${design.category}</div>
+              <div class="card-title">${friendlyStyle(design)}</div>
               <div class="card-votes">
                 <button
                   class="vote-btn like ${likeVoted ? 'voted' : ''}"
@@ -827,7 +878,8 @@ header {
               >
             </div>
             <div class="card-info">
-              <div class="card-title">${design.title}</div>
+              <div class="card-theme">${themeEmoji(design.category)} ${design.category}</div>
+              <div class="card-title">${friendlyStyle(design)}</div>
               <div class="card-votes">
                 <button
                   class="vote-btn like ${likeVoted ? 'voted' : ''}"
@@ -870,9 +922,9 @@ header {
     // Render categories
     function renderCategories() {
       categoriesEl.innerHTML = `
-        <div class="cat-item ${!cat ? 'active' : ''}" data-c="">All</div>
+        <div class="cat-item ${!cat ? 'active' : ''}" data-c="">🌊 All</div>
         ${categories.map(c => `
-          <div class="cat-item ${cat === c ? 'active' : ''}" data-c="${c}">${c}</div>
+          <div class="cat-item ${cat === c ? 'active' : ''}" data-c="${c}">${themeEmoji(c)} ${c}</div>
         `).join('')}
       `;
     }
@@ -905,7 +957,7 @@ header {
       lbIdx = index;
       const design = designs[index];
       lbImg.src = `thumbs/${design.filename}`;
-      lbTitle.textContent = design.title;
+      lbTitle.textContent = `${themeEmoji(design.category)} ${design.category} · ${friendlyStyle(design)}`;
       lightbox.classList.add('show');
       document.body.style.overflow = 'hidden';
       
