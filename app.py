@@ -156,13 +156,40 @@ async def get_my_votes(voter_id: str):
             result[voter_votes.get("design_id")] = voter_votes.get("action", voter_votes.get("vote_type"))
     return result
 
+def _client_ip(request: Request) -> str:
+    # Zeabur (like most PaaS) sits behind a proxy — the real client IP is in
+    # X-Forwarded-For, not request.client.host (which would be the proxy's IP).
+    fwd = request.headers.get("x-forwarded-for")
+    if fwd:
+        return fwd.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _ip_already_voted_elsewhere(votes: dict, design_id: str, ip: str, voter_id: str) -> bool:
+    """True if some OTHER voter_id from this same IP already has a vote on this
+    design. voter_id is client-supplied and trivially forgeable (no login, no
+    cookie) — anyone could otherwise cast unlimited votes on one design just by
+    sending a fresh random voter_id each time. This closes that gap without
+    requiring accounts, at the cost of shared-IP false positives (offices, NAT)."""
+    if ip == "unknown":
+        return False
+    for vid, vlist in votes.items():
+        if vid == voter_id or not isinstance(vlist, list):
+            continue
+        for v in vlist:
+            if v.get("design_id") == design_id and v.get("ip") == ip:
+                return True
+    return False
+
+
 @app.post("/api/vote")
 async def cast_vote(request: Request):
     data = await request.json()
     voter_id = data.get("voter_id") or request.query_params.get("voter_id")
     design_id = data.get("design_id")
     action = data.get("vote_type") or data.get("action")
-    
+    ip = _client_ip(request)
+
     # Handle explicit remove action
     if action == 'remove':
         votes = load_votes()
@@ -172,15 +199,15 @@ async def cast_vote(request: Request):
                 del votes[voter_id]
             save_votes(votes)
         return {"ok": True, "action": "removed"}
-    
+
     if not all([voter_id, design_id, action]):
         raise HTTPException(status_code=400, detail="Missing parameters")
-    
+
     if action not in ["like", "dislike"]:
         raise HTTPException(status_code=400, detail="Invalid action")
-    
+
     votes = load_votes()
-    
+
     # Check if already voted (allow changing vote)
     existing_idx = None
     if voter_id in votes:
@@ -188,7 +215,7 @@ async def cast_vote(request: Request):
             if v["design_id"] == design_id:
                 existing_idx = i
                 break
-    
+
     if existing_idx is not None:
         if votes[voter_id][existing_idx]["vote_type"] == action:
             # Same vote — remove it (toggle off)
@@ -201,18 +228,25 @@ async def cast_vote(request: Request):
             # Different vote — update it
             votes[voter_id][existing_idx]["vote_type"] = action
             votes[voter_id][existing_idx]["created_at"] = str(uuid.uuid4())
+            votes[voter_id][existing_idx]["ip"] = ip
             save_votes(votes)
             return {"ok": True, "action": "changed"}
-    
+
+    # Brand-new vote for this voter_id — reject if this IP already voted on this
+    # design under a different voter_id (see _ip_already_voted_elsewhere).
+    if _ip_already_voted_elsewhere(votes, design_id, ip, voter_id):
+        raise HTTPException(status_code=429, detail="Already voted for this design")
+
     # Record new vote in array format
     if voter_id not in votes:
         votes[voter_id] = []
     votes[voter_id].append({
         "design_id": design_id,
         "vote_type": action,
-        "created_at": str(uuid.uuid4())
+        "created_at": str(uuid.uuid4()),
+        "ip": ip,
     })
-    
+
     save_votes(votes)
     return {"ok": True}
 

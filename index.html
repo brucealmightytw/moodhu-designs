@@ -238,9 +238,20 @@ header {
     flex-direction: column;
     gap: 8px;
   }
+  .categories {
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    margin: 0 -12px;
+    padding-left: 12px;
+    padding-right: 12px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 24px), transparent);
+  }
   .cat-item {
     font-size: 12px;
     padding: 5px 10px;
+    scroll-snap-align: start;
   }
   .card-title {
     font-size: 12px;
@@ -659,15 +670,6 @@ header {
     const VOTER_ID_KEY = 'moodhu_voter_id';
     const WELCOME_KEY = 'moodhu_welcome_shown';
 
-    const THEME_EMOJIS = {
-      Clownfish: '🐠', Dolphin: '🐬', HammerheadShark: '🦈',
-      MandalaMantaWhaleShark: '🐋', MantaRay: '🐡', MantaWhaleShark: '🐋',
-      Mixed: '🎨', NapoleonWrasse: '🐟', ReefShark: '🦈', SeaTurtle: '🐢',
-      TigerShark: '🦈', TropicalFish: '🐠', WhaleShark: '🦈',
-      Uncategorized: '📦', _unsorted: '📦',
-    };
-    const themeEmoji = c => THEME_EMOJIS[c] || '🌊';
-
     // Turn a raw filename-derived id ("Clownfish-AfremovOil-Wide-50x92") into a
     // friendly display label ("Afremov Oil") — strips the leading theme prefix
     // (shown separately via the category pill/emoji) and trailing size/version
@@ -819,7 +821,7 @@ header {
               >
             </div>
             <div class="card-info">
-              <div class="card-theme">${themeEmoji(design.category)} ${design.category}</div>
+              <div class="card-theme">${design.category}</div>
               <div class="card-title">${friendlyStyle(design)}</div>
               <div class="card-votes">
                 <button
@@ -878,7 +880,7 @@ header {
               >
             </div>
             <div class="card-info">
-              <div class="card-theme">${themeEmoji(design.category)} ${design.category}</div>
+              <div class="card-theme">${design.category}</div>
               <div class="card-title">${friendlyStyle(design)}</div>
               <div class="card-votes">
                 <button
@@ -922,9 +924,9 @@ header {
     // Render categories
     function renderCategories() {
       categoriesEl.innerHTML = `
-        <div class="cat-item ${!cat ? 'active' : ''}" data-c="">🌊 All</div>
+        <div class="cat-item ${!cat ? 'active' : ''}" data-c="">All</div>
         ${categories.map(c => `
-          <div class="cat-item ${cat === c ? 'active' : ''}" data-c="${c}">${themeEmoji(c)} ${c}</div>
+          <div class="cat-item ${cat === c ? 'active' : ''}" data-c="${c}">${c}</div>
         `).join('')}
       `;
     }
@@ -957,7 +959,7 @@ header {
       lbIdx = index;
       const design = designs[index];
       lbImg.src = `thumbs/${design.filename}`;
-      lbTitle.textContent = `${themeEmoji(design.category)} ${design.category} · ${friendlyStyle(design)}`;
+      lbTitle.textContent = `${design.category} · ${friendlyStyle(design)}`;
       lightbox.classList.add('show');
       document.body.style.overflow = 'hidden';
       
@@ -1054,6 +1056,9 @@ header {
           body: JSON.stringify(body)
         });
         
+        if (res.status === 429) {
+          throw new Error('duplicate');
+        }
         if (!res.ok) {
           throw new Error('Vote failed');
         }
@@ -1073,7 +1078,9 @@ header {
         design.votes.net = design.votes.likes - design.votes.dislikes;
         applyFilters();
         renderStats();
-        alert('Vote failed. Please try again.');
+        alert(err.message === 'duplicate'
+          ? "Looks like you've already voted for this design from this network."
+          : 'Vote failed. Please try again.');
       }
     }
 
