@@ -11,7 +11,7 @@ from typing import Dict, Any
 app = FastAPI()
 
 # Config
-DATA_DIR = Path(".")
+DATA_DIR = Path(os.environ.get("DATA_DIR", "."))
 DATA_DIR.mkdir(exist_ok=True)
 DESIGNS_FILE = DATA_DIR / "designs.json"
 DELETED_FILE = DATA_DIR / "deleted_ids.json"
