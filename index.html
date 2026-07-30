@@ -537,6 +537,30 @@ header {
   .delete-btn { opacity: 0.35; }
 }
 
+.admin-only {
+  display: none !important;
+}
+
+body.admin-mode .admin-only {
+  display: inline-flex !important;
+}
+
+.admin-mode-btn {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text2);
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+body.admin-mode .admin-mode-btn {
+  background: rgba(255, 149, 0, 0.15);
+  border-color: #ff9500;
+  color: #ff9500;
+}
+
 .flag-btn {
   flex: 0 0 auto;
   background: transparent;
@@ -878,6 +902,7 @@ header {
         <span><span id="totalDesigns">0</span> designs</span>
         <span><span id="totalLikes">0</span> likes</span>
         <span><span id="totalDislikes">0</span> dislikes</span>
+        <button id="adminModeBtn" class="admin-mode-btn">Admin</button>
       </div>
     </div>
   </header>
@@ -896,7 +921,7 @@ header {
     <div class="search-box">
       <input type="text" id="searchInput" class="search-input" placeholder="Search designs...">
     </div>
-    <button id="selectModeBtn" class="select-mode-toggle" title="Select multiple cards to flag (admin)">Select</button>
+    <button id="selectModeBtn" class="select-mode-toggle admin-only" title="Select multiple cards to flag (admin)">Select</button>
   </div>
 
   <div class="select-bar" id="selectBar">
@@ -931,7 +956,7 @@ header {
 
   <button id="backToTop" title="Back to top">↑</button>
 
-  <button id="reviewPanelBtn" title="Review flagged designs (admin)" style="position:fixed;bottom:24px;left:24px;width:44px;height:44px;border-radius:50%;background:var(--surface2);border:1px solid rgba(255,255,255,0.1);color:var(--text2);font-size:16px;z-index:90;opacity:0.5;">🚩</button>
+  <button id="reviewPanelBtn" class="admin-only" title="Review flagged designs (admin)" style="position:fixed;bottom:24px;left:24px;width:44px;height:44px;border-radius:50%;background:var(--surface2);border:1px solid rgba(255,255,255,0.1);color:var(--text2);font-size:16px;z-index:90;opacity:0.5;">🚩</button>
 
   <div class="modal" id="reviewModal">
     <div class="modal-content" style="max-width:560px;">
@@ -997,6 +1022,8 @@ header {
     let voterId = localStorage.getItem(VOTER_ID_KEY) || crypto.randomUUID();
     let selectMode = false;
     let selectedIds = new Set();
+    let adminMode = false;
+    let adminPassword = null;
     localStorage.setItem(VOTER_ID_KEY, voterId);
     let eventsInitialized = false;
 
@@ -1032,6 +1059,7 @@ header {
     const selectCountEl = document.getElementById('selectCount');
     const flagSelectedBtn = document.getElementById('flagSelectedBtn');
     const cancelSelectBtn = document.getElementById('cancelSelectBtn');
+    const adminModeBtn = document.getElementById('adminModeBtn');
 
     // Initialize
     async function init() {
@@ -1164,14 +1192,14 @@ header {
                   👎 ${design.votes.dislikes}
                 </button>
                 <button
-                  class="vote-btn flag-btn ${design.flagged ? 'flagged' : ''}"
+                  class="vote-btn flag-btn admin-only ${design.flagged ? 'flagged' : ''}"
                   data-design-id="${design.id}"
                   title="${design.flagged ? 'Already flagged for review' : 'Flag: category doesn\'t match image (admin)'}"
                 >
                   🚩
                 </button>
                 <button
-                  class="vote-btn delete-btn"
+                  class="vote-btn delete-btn admin-only"
                   data-index="${index}"
                   data-design-id="${design.id}"
                   title="Delete (admin)"
@@ -1231,14 +1259,14 @@ header {
                   👎 ${design.votes.dislikes}
                 </button>
                 <button
-                  class="vote-btn flag-btn ${design.flagged ? 'flagged' : ''}"
+                  class="vote-btn flag-btn admin-only ${design.flagged ? 'flagged' : ''}"
                   data-design-id="${design.id}"
                   title="${design.flagged ? 'Already flagged for review' : 'Flag: category doesn\'t match image (admin)'}"
                 >
                   🚩
                 </button>
                 <button
-                  class="vote-btn delete-btn"
+                  class="vote-btn delete-btn admin-only"
                   data-index="${index}"
                   data-design-id="${design.id}"
                   title="Delete (admin)"
@@ -1293,6 +1321,43 @@ header {
       if (index >= 0) openLb(index);
     }
 
+    // Admin mode: verify the password once, then reuse it for delete/flag/correct
+    // actions without re-prompting each time. Exiting hides the admin controls again.
+    async function toggleAdminMode() {
+      if (adminMode) {
+        adminMode = false;
+        adminPassword = null;
+        document.body.classList.remove('admin-mode');
+        adminModeBtn.textContent = 'Admin';
+        if (selectMode) toggleSelectMode();
+        return;
+      }
+
+      const password = prompt('Enter admin password:');
+      if (!password) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        if (res.status === 403) {
+          alert('Wrong password');
+          return;
+        }
+        if (!res.ok) throw new Error('Verify failed');
+
+        adminMode = true;
+        adminPassword = password;
+        document.body.classList.add('admin-mode');
+        adminModeBtn.textContent = 'Save & exit';
+      } catch (err) {
+        console.error('Admin verify error:', err);
+        alert('Could not verify. Please try again.');
+      }
+    }
+
     // In select mode, clicking a card toggles its selection instead of opening the lightbox
     function handleCardClick(designId) {
       if (selectMode) {
@@ -1334,7 +1399,7 @@ header {
 
     async function flagSelected() {
       if (!selectedIds.size) return;
-      const password = prompt('Enter admin password:');
+      const password = adminPassword;
       if (!password) return;
 
       const ids = [...selectedIds];
@@ -1510,7 +1575,7 @@ header {
     async function doFlag(designId) {
       const design = designs.find(d => d.id === designId);
       if (!design) return;
-      const password = prompt('Enter admin password:');
+      const password = adminPassword;
       if (!password) return;
 
       try {
@@ -1579,7 +1644,7 @@ header {
     }
 
     async function doCorrectBatch(items) {
-      const password = prompt('Enter admin password:');
+      const password = adminPassword;
       if (!password) return;
 
       let failed = 0;
@@ -1615,7 +1680,7 @@ header {
     }
 
     async function doCorrect(designId, category, rowEl) {
-      const password = prompt('Enter admin password:');
+      const password = adminPassword;
       if (!password) return;
 
       try {
@@ -1646,7 +1711,7 @@ header {
 
     async function doDelete(index) {
       const design = designs[index];
-      const password = prompt('Enter admin password:');
+      const password = adminPassword;
       if (!password) return;
 
       if (!confirm(`Delete ${design.title}? This cannot be undone.`)) {
@@ -1767,6 +1832,7 @@ header {
         }
       });
 
+      adminModeBtn.addEventListener('click', toggleAdminMode);
       selectModeBtn.addEventListener('click', toggleSelectMode);
       cancelSelectBtn.addEventListener('click', toggleSelectMode);
       flagSelectedBtn.addEventListener('click', flagSelected);

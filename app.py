@@ -316,6 +316,17 @@ async def delete_design(request: Request):
 async def get_categories():
     return {"categories": CATEGORIES}
 
+@app.post("/api/admin/verify")
+async def verify_admin(request: Request):
+    """Checks the password with no side effects, so the frontend can enter
+    admin mode once and reuse the password for subsequent actions without
+    re-prompting on every delete/flag/correct."""
+    data = await request.json()
+    password = data.get("password")
+    if password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Wrong password")
+    return {"ok": True}
+
 @app.post("/api/flag")
 async def flag_design(request: Request):
     data = await request.json()
