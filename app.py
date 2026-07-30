@@ -16,7 +16,18 @@ DATA_DIR.mkdir(exist_ok=True)
 DESIGNS_FILE = DATA_DIR / "designs.json"
 DELETED_FILE = DATA_DIR / "deleted_ids.json"
 VOTES_FILE = DATA_DIR / "votes.json"
+FLAGGED_FILE = DATA_DIR / "flagged.json"
+CORRECTIONS_FILE = DATA_DIR / "corrections.json"
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "moodhu")
+
+# Canonical category list for the correction dropdown — keep in sync with the
+# real species/themes used across designs.json. "Uncategorized" and any stray
+# filesystem-path values are deliberately excluded; pick the closest real match instead.
+CATEGORIES = [
+    "Clownfish", "Dolphin", "HammerheadShark", "MandalaMantaWhaleShark",
+    "MantaRay", "MantaWhaleShark", "Mixed", "NapoleonWrasse", "ReefShark",
+    "SeaTurtle", "TigerShark", "TropicalFish", "WhaleShark",
+]
 
 # Initialize data files
 if not DELETED_FILE.exists():
@@ -25,6 +36,14 @@ if not DELETED_FILE.exists():
 
 if not VOTES_FILE.exists():
     with open(VOTES_FILE, "w") as f:
+        json.dump({}, f)
+
+if not FLAGGED_FILE.exists():
+    with open(FLAGGED_FILE, "w") as f:
+        json.dump({}, f)
+
+if not CORRECTIONS_FILE.exists():
+    with open(CORRECTIONS_FILE, "w") as f:
         json.dump({}, f)
 
 # Load data
@@ -62,12 +81,30 @@ def save_votes(votes):
     with open(VOTES_FILE, "w") as f:
         json.dump(votes, f, indent=2)
 
+def load_flagged():
+    with open(FLAGGED_FILE, "r") as f:
+        return json.load(f)
+
+def save_flagged(flagged):
+    with open(FLAGGED_FILE, "w") as f:
+        json.dump(flagged, f, indent=2)
+
+def load_corrections():
+    with open(CORRECTIONS_FILE, "r") as f:
+        return json.load(f)
+
+def save_corrections(corrections):
+    with open(CORRECTIONS_FILE, "w") as f:
+        json.dump(corrections, f, indent=2)
+
 # API Endpoints
 @app.get("/api/designs")
 async def get_designs():
     data = load_designs()
     deleted = load_deleted()
     votes = load_votes()
+    corrections = load_corrections()
+    flagged = load_flagged()
 
     # Aggregate votes
     agg = {}
@@ -94,6 +131,11 @@ async def get_designs():
             "dislikes": v["dislikes"],
             "net": v["likes"] - v["dislikes"]
         }
+        correction = corrections.get(d["id"])
+        if correction and correction.get("confirmed"):
+            d["category"] = correction["category"]
+        if d["id"] in flagged:
+            d["flagged"] = True
         designs.append(d)
 
     # Sort by net votes descending (default ranking)
@@ -267,7 +309,95 @@ async def delete_design(request: Request):
     if design_id not in deleted:
         deleted.append(design_id)
         save_deleted(deleted)
-    
+
+    return {"ok": True}
+
+@app.get("/api/categories")
+async def get_categories():
+    return {"categories": CATEGORIES}
+
+@app.post("/api/flag")
+async def flag_design(request: Request):
+    data = await request.json()
+    design_id = data.get("design_id")
+    password = data.get("password")
+
+    if password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Wrong password")
+    if not design_id:
+        raise HTTPException(status_code=400, detail="Missing design_id")
+
+    flagged = load_flagged()
+    if design_id not in flagged:
+        flagged[design_id] = {"flagged_at": time.time()}
+        save_flagged(flagged)
+
+    return {"ok": True}
+
+@app.get("/api/flagged")
+async def get_flagged():
+    flagged = load_flagged()
+    corrections = load_corrections()
+    designs = {d["id"]: d for d in load_designs()["designs"]}
+
+    result = []
+    for design_id, info in flagged.items():
+        d = designs.get(design_id)
+        if not d:
+            continue
+        correction = corrections.get(design_id, {})
+        result.append({
+            "id": design_id,
+            "filename": d.get("filename"),
+            "title": d.get("title"),
+            "current_category": d.get("category"),
+            "suggested_category": correction.get("suggested_category"),
+            "flagged_at": info.get("flagged_at"),
+        })
+
+    return {"flagged": result, "categories": CATEGORIES}
+
+@app.post("/api/suggest")
+async def suggest_correction(request: Request):
+    """Claude Code writes its suggested category here after visually inspecting
+    a flagged design's image. Not applied until Bruce confirms via /api/correct —
+    unauthenticated on purpose, low risk, this only pre-fills the review dropdown."""
+    data = await request.json()
+    design_id = data.get("design_id")
+    category = data.get("category")
+
+    if not design_id or category not in CATEGORIES:
+        raise HTTPException(status_code=400, detail="Missing design_id or invalid category")
+
+    corrections = load_corrections()
+    existing = corrections.get(design_id, {})
+    existing["suggested_category"] = category
+    corrections[design_id] = existing
+    save_corrections(corrections)
+
+    return {"ok": True}
+
+@app.post("/api/correct")
+async def correct_design(request: Request):
+    data = await request.json()
+    design_id = data.get("design_id")
+    category = data.get("category")
+    password = data.get("password")
+
+    if password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Wrong password")
+    if not design_id or category not in CATEGORIES:
+        raise HTTPException(status_code=400, detail="Missing design_id or invalid category")
+
+    corrections = load_corrections()
+    corrections[design_id] = {"category": category, "confirmed": True}
+    save_corrections(corrections)
+
+    flagged = load_flagged()
+    if design_id in flagged:
+        del flagged[design_id]
+        save_flagged(flagged)
+
     return {"ok": True}
 
 # Static files

@@ -444,6 +444,95 @@ header {
   .delete-btn { opacity: 0.35; }
 }
 
+.flag-btn {
+  flex: 0 0 auto;
+  background: transparent;
+  color: var(--text3);
+  font-size: 14px;
+  padding: 6px 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.card:hover .flag-btn,
+.card:focus-within .flag-btn {
+  opacity: 0.6;
+}
+
+.flag-btn:hover {
+  opacity: 1;
+  color: #ff9500;
+  background: rgba(255, 149, 0, 0.1);
+}
+
+.flag-btn.flagged {
+  opacity: 1;
+  color: #ff9500;
+}
+
+@media (hover: none) {
+  .flag-btn { opacity: 0.35; }
+}
+
+/* ═══ REVIEW PANEL ═══ */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.review-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  background: var(--surface2);
+  border-radius: 8px;
+}
+
+.review-row img {
+  width: 56px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex: 0 0 auto;
+}
+
+.review-row .review-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.review-row .review-current {
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.review-row select {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.review-row .review-save {
+  flex: 0 0 auto;
+  background: var(--gold);
+  color: #000;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
 /* ═══ LIGHTBOX ═══ */
 #lightbox {
   position: fixed;
@@ -696,6 +785,16 @@ header {
 
   <button id="backToTop" title="Back to top">↑</button>
 
+  <button id="reviewPanelBtn" title="Review flagged designs (admin)" style="position:fixed;bottom:24px;left:24px;width:44px;height:44px;border-radius:50%;background:var(--surface2);border:1px solid rgba(255,255,255,0.1);color:var(--text2);font-size:16px;z-index:90;opacity:0.5;">🚩</button>
+
+  <div class="modal" id="reviewModal">
+    <div class="modal-content" style="max-width:560px;">
+      <h2 style="margin-bottom:16px;">Flagged Designs</h2>
+      <div class="review-list" id="reviewList"></div>
+      <button id="closeReview" style="margin-top:16px;">Close</button>
+    </div>
+  </div>
+
   <div class="modal" id="welcomeModal">
     <div class="modal-content">
       <h2>Welcome to Moodhu Designs</h2>
@@ -765,6 +864,10 @@ header {
     const backToTop = document.getElementById('backToTop');
     const welcomeModal = document.getElementById('welcomeModal');
     const closeWelcome = document.getElementById('closeWelcome');
+    const reviewPanelBtn = document.getElementById('reviewPanelBtn');
+    const reviewModal = document.getElementById('reviewModal');
+    const reviewListEl = document.getElementById('reviewList');
+    const closeReview = document.getElementById('closeReview');
 
     // Initialize
     async function init() {
@@ -887,6 +990,13 @@ header {
                   👎 ${design.votes.dislikes}
                 </button>
                 <button
+                  class="vote-btn flag-btn ${design.flagged ? 'flagged' : ''}"
+                  data-design-id="${design.id}"
+                  title="${design.flagged ? 'Already flagged for review' : 'Flag: category doesn\'t match image (admin)'}"
+                >
+                  🚩
+                </button>
+                <button
                   class="vote-btn delete-btn"
                   data-index="${index}"
                   data-design-id="${design.id}"
@@ -944,6 +1054,13 @@ header {
                   data-design-id="${design.id}"
                 >
                   👎 ${design.votes.dislikes}
+                </button>
+                <button
+                  class="vote-btn flag-btn ${design.flagged ? 'flagged' : ''}"
+                  data-design-id="${design.id}"
+                  title="${design.flagged ? 'Already flagged for review' : 'Flag: category doesn\'t match image (admin)'}"
+                >
+                  🚩
                 </button>
                 <button
                   class="vote-btn delete-btn"
@@ -1144,6 +1261,96 @@ header {
       if (index >= 0) await doDelete(index);
     }
 
+    // Flag a design as having a wrong category vs. what the image shows
+    async function doFlag(designId) {
+      const design = designs.find(d => d.id === designId);
+      if (!design) return;
+      const password = prompt('Enter admin password:');
+      if (!password) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/flag`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ design_id: designId, password })
+        });
+        if (res.status === 403) {
+          alert('Wrong password');
+          return;
+        }
+        if (!res.ok) throw new Error('Flag failed');
+        alert(`Flagged "${design.title}" for review.`);
+      } catch (err) {
+        console.error('Flag error:', err);
+        alert('Flag failed. Please try again.');
+      }
+    }
+
+    // Review panel: list flagged designs, let Bruce pick the correct category from a dropdown
+    async function openReviewPanel() {
+      reviewModal.classList.add('show');
+      reviewListEl.innerHTML = '<p style="color:var(--text2);">Loading...</p>';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/flagged`);
+        const data = await res.json();
+
+        if (!data.flagged.length) {
+          reviewListEl.innerHTML = '<p style="color:var(--text2);">No flagged designs. All clear.</p>';
+          return;
+        }
+
+        reviewListEl.innerHTML = data.flagged.map(item => {
+          const options = data.categories.map(c =>
+            `<option value="${c}" ${c === (item.suggested_category || item.current_category) ? 'selected' : ''}>${c}</option>`
+          ).join('');
+          return `
+            <div class="review-row" data-design-id="${item.id}">
+              <img src="thumbs/${item.filename}" alt="${item.title}">
+              <div class="review-info">
+                <div class="review-current">Currently: ${item.current_category}${item.suggested_category ? ` · Claude suggests: ${item.suggested_category}` : ' · no suggestion yet'}</div>
+                <select class="review-select">${options}</select>
+              </div>
+              <button class="review-save">Save</button>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Load flagged error:', err);
+        reviewListEl.innerHTML = '<p style="color:var(--text2);">Failed to load. Please try again.</p>';
+      }
+    }
+
+    async function doCorrect(designId, category, rowEl) {
+      const password = prompt('Enter admin password:');
+      if (!password) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/correct`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ design_id: designId, category, password })
+        });
+        if (res.status === 403) {
+          alert('Wrong password');
+          return;
+        }
+        if (!res.ok) throw new Error('Correct failed');
+
+        rowEl.remove();
+        const design = designs.find(d => d.id === designId);
+        if (design) design.category = category;
+        applyFilters();
+
+        if (!reviewListEl.children.length) {
+          reviewListEl.innerHTML = '<p style="color:var(--text2);">No flagged designs. All clear.</p>';
+        }
+      } catch (err) {
+        console.error('Correct error:', err);
+        alert('Save failed. Please try again.');
+      }
+    }
+
     async function doDelete(index) {
       const design = designs[index];
       const password = prompt('Enter admin password:');
@@ -1254,6 +1461,27 @@ header {
           const btn = e.target.classList.contains('delete-btn') ? e.target : e.target.closest('.delete-btn');
           const designId = btn.dataset.designId;
           if (designId) doDeleteById(designId);
+        }
+
+        // Flag button
+        if (e.target.classList.contains('flag-btn') || e.target.closest('.flag-btn')) {
+          const btn = e.target.classList.contains('flag-btn') ? e.target : e.target.closest('.flag-btn');
+          const designId = btn.dataset.designId;
+          if (designId) doFlag(designId);
+        }
+      });
+
+      reviewPanelBtn.addEventListener('click', openReviewPanel);
+      closeReview.addEventListener('click', () => reviewModal.classList.remove('show'));
+      reviewModal.addEventListener('click', e => {
+        if (e.target === reviewModal) reviewModal.classList.remove('show');
+      });
+      reviewListEl.addEventListener('click', e => {
+        if (e.target.classList.contains('review-save')) {
+          const row = e.target.closest('.review-row');
+          const designId = row.dataset.designId;
+          const category = row.querySelector('.review-select').value;
+          doCorrect(designId, category, row);
         }
       });
 
