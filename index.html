@@ -184,6 +184,99 @@ header {
   color: var(--text3);
 }
 
+.select-mode-toggle {
+  flex: 0 0 auto;
+  background: var(--surface);
+  color: var(--text2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius);
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.select-mode-toggle.active {
+  background: rgba(255, 149, 0, 0.15);
+  border-color: #ff9500;
+  color: #ff9500;
+}
+
+.select-bar {
+  display: none;
+  position: sticky;
+  top: 65px;
+  z-index: 95;
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 10px 24px;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 149, 0, 0.12);
+  border-bottom: 1px solid rgba(255, 149, 0, 0.3);
+  font-size: 13px;
+  color: #ff9500;
+}
+
+.select-bar.show {
+  display: flex;
+}
+
+.select-bar button {
+  background: #ff9500;
+  color: #000;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.select-bar #cancelSelectBtn {
+  background: transparent;
+  color: var(--text2);
+  font-weight: 400;
+}
+
+/* Selection overlay on cards, only shown in select mode */
+.card-select-mark {
+  display: none;
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  z-index: 5;
+}
+
+.gallery.select-mode .card-select-mark,
+.top-gallery.select-mode .card-select-mark {
+  display: block;
+}
+
+.card.selected .card-select-mark {
+  background: #ff9500;
+  border-color: #ff9500;
+}
+
+.card.selected .card-select-mark::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.card.selected {
+  outline: 2px solid #ff9500;
+  outline-offset: -2px;
+}
+
 .categories-wrap {
   max-width: var(--w);
   margin: 0 auto;
@@ -803,6 +896,13 @@ header {
     <div class="search-box">
       <input type="text" id="searchInput" class="search-input" placeholder="Search designs...">
     </div>
+    <button id="selectModeBtn" class="select-mode-toggle" title="Select multiple cards to flag (admin)">Select</button>
+  </div>
+
+  <div class="select-bar" id="selectBar">
+    <span id="selectCount">0 selected</span>
+    <button id="flagSelectedBtn">Flag selected</button>
+    <button id="cancelSelectBtn">Cancel</button>
   </div>
 
   <div class="categories-wrap">
@@ -895,7 +995,10 @@ header {
     let myVotes = {};
     let lbIdx = null;
     let voterId = localStorage.getItem(VOTER_ID_KEY) || crypto.randomUUID();
+    let selectMode = false;
+    let selectedIds = new Set();
     localStorage.setItem(VOTER_ID_KEY, voterId);
+    let eventsInitialized = false;
 
     // DOM
     const galleryEl = document.getElementById('gallery');
@@ -924,9 +1027,18 @@ header {
     const reviewSelectAll = document.getElementById('reviewSelectAll');
     const reviewSaveSelected = document.getElementById('reviewSaveSelected');
     const reviewSelectedCount = document.getElementById('reviewSelectedCount');
+    const selectModeBtn = document.getElementById('selectModeBtn');
+    const selectBar = document.getElementById('selectBar');
+    const selectCountEl = document.getElementById('selectCount');
+    const flagSelectedBtn = document.getElementById('flagSelectedBtn');
+    const cancelSelectBtn = document.getElementById('cancelSelectBtn');
 
     // Initialize
     async function init() {
+      // Set up event listeners regardless of whether the data fetch below
+      // succeeds, so buttons aren't dead if the API is temporarily down.
+      setupEvents();
+
       try {
         // Show loading
         loadingEl.style.display = 'flex';
@@ -966,14 +1078,19 @@ header {
           welcomeModal.classList.add('show');
         }
 
-        // Set up event listeners
-        setupEvents();
-
         // Preload images
         preloadImages();
       } catch (err) {
         console.error('Init error:', err);
-        loadingEl.textContent = 'Failed to load designs. Please refresh.';
+        loadingEl.innerHTML = '';
+        const msg = document.createElement('span');
+        msg.textContent = 'Failed to load designs. ';
+        const retryBtn = document.createElement('button');
+        retryBtn.type = 'button';
+        retryBtn.textContent = 'Retry';
+        retryBtn.addEventListener('click', () => init());
+        loadingEl.appendChild(msg);
+        loadingEl.appendChild(retryBtn);
       }
     }
 
@@ -1013,8 +1130,9 @@ header {
         const dislikeVoted = voted === 'dislike';
 
         return `
-          <div class="card ${isTop ? 'top' + (index + 1) : ''}" data-index="${index}" data-design-id="${design.id}">
+          <div class="card ${isTop ? 'top' + (index + 1) : ''} ${selectedIds.has(design.id) ? 'selected' : ''}" data-index="${index}" data-design-id="${design.id}">
             <div class="card-img-container">
+              <div class="card-select-mark" onclick="handleCardClick('${design.id}')"></div>
               <img
                 src="thumbs/${design.filename}"
                 alt="${design.title}"
@@ -1022,7 +1140,7 @@ header {
                 loading="lazy"
                 decoding="async"
                 onload="this.classList.add('loaded')"
-                onclick="openLbById('${design.id}')"
+                onclick="handleCardClick('${design.id}')"
               >
             </div>
             <div class="card-info">
@@ -1078,8 +1196,9 @@ header {
         const dislikeVoted = voted === 'dislike';
 
         return `
-          <div class="card top${index + 1}" data-index="${index}" data-design-id="${design.id}">
+          <div class="card top${index + 1} ${selectedIds.has(design.id) ? 'selected' : ''}" data-index="${index}" data-design-id="${design.id}">
             <div class="card-img-container">
+              <div class="card-select-mark" onclick="handleCardClick('${design.id}')"></div>
               <img
                 src="thumbs/${design.filename}"
                 alt="${design.title}"
@@ -1088,7 +1207,7 @@ header {
                 fetchpriority="high"
                 decoding="async"
                 onload="this.classList.add('loaded')"
-                onclick="openLbById('${design.id}')"
+                onclick="handleCardClick('${design.id}')"
               >
             </div>
             <div class="card-info">
@@ -1172,6 +1291,76 @@ header {
     function openLbById(designId) {
       const index = designs.findIndex(d => d.id === designId);
       if (index >= 0) openLb(index);
+    }
+
+    // In select mode, clicking a card toggles its selection instead of opening the lightbox
+    function handleCardClick(designId) {
+      if (selectMode) {
+        toggleCardSelection(designId);
+      } else {
+        openLbById(designId);
+      }
+    }
+
+    function toggleCardSelection(designId) {
+      if (selectedIds.has(designId)) {
+        selectedIds.delete(designId);
+      } else {
+        selectedIds.add(designId);
+      }
+      document.querySelectorAll(`.card[data-design-id="${designId}"]`).forEach(el => {
+        el.classList.toggle('selected', selectedIds.has(designId));
+      });
+      updateSelectBar();
+    }
+
+    function toggleSelectMode() {
+      selectMode = !selectMode;
+      selectedIds.clear();
+      selectModeBtn.classList.toggle('active', selectMode);
+      galleryEl.classList.toggle('select-mode', selectMode);
+      topGalleryEl.classList.toggle('select-mode', selectMode);
+      document.querySelectorAll('.card.selected').forEach(el => el.classList.remove('selected'));
+      updateSelectBar();
+    }
+
+    function updateSelectBar() {
+      const n = selectedIds.size;
+      selectCountEl.textContent = `${n} selected`;
+      selectBar.classList.toggle('show', selectMode);
+      flagSelectedBtn.disabled = n === 0;
+      flagSelectedBtn.style.opacity = n === 0 ? '0.4' : '1';
+    }
+
+    async function flagSelected() {
+      if (!selectedIds.size) return;
+      const password = prompt('Enter admin password:');
+      if (!password) return;
+
+      const ids = [...selectedIds];
+      let failed = 0;
+      for (const id of ids) {
+        try {
+          const res = await fetch(`${API_BASE}/api/flag`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ design_id: id, password })
+          });
+          if (res.status === 403) {
+            alert('Wrong password');
+            return;
+          }
+          if (!res.ok) throw new Error('Flag failed');
+        } catch (err) {
+          console.error('Batch flag error:', err);
+          failed++;
+        }
+      }
+
+      alert(failed
+        ? `Flagged ${ids.length - failed} design(s). ${failed} failed — please retry those.`
+        : `Flagged ${ids.length} design(s) for review.`);
+      toggleSelectMode();
     }
 
     function openLb(index) {
@@ -1495,6 +1684,9 @@ header {
 
     // Setup event listeners
     function setupEvents() {
+      if (eventsInitialized) return;
+      eventsInitialized = true;
+
       // Sort change
       sortSelect.addEventListener('change', () => {
         sort = sortSelect.value;
@@ -1574,6 +1766,10 @@ header {
           if (designId) doFlag(designId);
         }
       });
+
+      selectModeBtn.addEventListener('click', toggleSelectMode);
+      cancelSelectBtn.addEventListener('click', toggleSelectMode);
+      flagSelectedBtn.addEventListener('click', flagSelected);
 
       reviewPanelBtn.addEventListener('click', openReviewPanel);
       closeReview.addEventListener('click', () => reviewModal.classList.remove('show'));
