@@ -63,6 +63,47 @@ img {
   display: block;
 }
 
+/* ═══ HERO ═══ */
+.hero {
+  max-width: var(--w);
+  margin: 0 auto;
+  padding: 72px 24px 40px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.07;
+}
+
+.hero p {
+  margin-top: 12px;
+  font-size: 19px;
+  color: var(--text2);
+  font-weight: 400;
+}
+
+@media (max-width: 767px) {
+  .hero {
+    padding: 48px 20px 28px;
+  }
+  .hero h1 {
+    font-size: 32px;
+  }
+  .hero p {
+    font-size: 16px;
+  }
+}
+
+.section-title {
+  padding: 0 24px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
 /* ═══ LAYOUT ═══ */
 header {
   position: sticky;
@@ -606,12 +647,17 @@ header {
     <div class="h-inner">
       <img src="logo.png" alt="Moodhu" class="logo">
       <div class="stats">
-        <span>🎨 <span id="totalDesigns">0</span> designs</span>
-        <span>👍 <span id="totalLikes">0</span> likes</span>
-        <span>👎 <span id="totalDislikes">0</span> dislikes</span>
+        <span><span id="totalDesigns">0</span> designs</span>
+        <span><span id="totalLikes">0</span> likes</span>
+        <span><span id="totalDislikes">0</span> dislikes</span>
       </div>
     </div>
   </header>
+
+  <div class="hero">
+    <h1>Moodhu Designs</h1>
+    <p>Vote for the ocean-themed fin art you'd want to see made real.</p>
+  </div>
 
   <div class="filters">
     <select id="sortSelect" class="sort-select">
@@ -629,10 +675,10 @@ header {
   </div>
 
   <div class="gallery-container">
-    <h2 style="padding: 0 24px; margin-bottom: 16px;">🏆 Top Designs</h2>
+    <h2 class="section-title" style="margin-bottom: 16px;">Top Designs</h2>
     <div class="top-gallery" id="topGallery"></div>
 
-    <h2 style="padding: 0 24px; margin: 32px 0 16px;">All Designs</h2>
+    <h2 class="section-title" style="margin: 40px 0 16px;">All Designs</h2>
     <div class="gallery" id="gallery"></div>
   </div>
 
@@ -652,13 +698,13 @@ header {
 
   <div class="modal" id="welcomeModal">
     <div class="modal-content">
-      <h2>🌊 Welcome to Moodhu Designs</h2>
+      <h2>Welcome to Moodhu Designs</h2>
       <p>This is an anonymous voting gallery for ocean-themed artworks.</p>
       <ul>
-        <li>👍 Click <strong>Like</strong> to vote for your favorite designs</li>
-        <li>👎 Click <strong>Dislike</strong> if you don't like it</li>
-        <li>🔍 Use the search bar to find specific artworks</li>
-        <li>🏆 Top designs are highlighted with gold borders</li>
+        <li>Click <strong>Like</strong> to vote for your favorite designs</li>
+        <li>Click <strong>Dislike</strong> if you don't like it</li>
+        <li>Use the search bar to find specific artworks</li>
+        <li>Top designs are highlighted with gold borders</li>
       </ul>
       <button id="closeWelcome">Got it!</button>
     </div>
