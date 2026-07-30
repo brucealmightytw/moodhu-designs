@@ -533,6 +533,52 @@ header {
   border-radius: 6px;
 }
 
+.review-row .review-check {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gold);
+}
+
+.review-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 14px;
+  gap: 12px;
+}
+
+.review-select-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+}
+
+.review-select-all input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold);
+}
+
+.review-save-selected {
+  background: var(--gold);
+  color: #000;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.review-save-selected.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 /* ═══ LIGHTBOX ═══ */
 #lightbox {
   position: fixed;
@@ -790,6 +836,12 @@ header {
   <div class="modal" id="reviewModal">
     <div class="modal-content" style="max-width:560px;">
       <h2 style="margin-bottom:16px;">Flagged Designs</h2>
+      <div class="review-bulk-bar" id="reviewBulkBar" style="display:none;">
+        <label class="review-select-all">
+          <input type="checkbox" id="reviewSelectAll"> Select all
+        </label>
+        <button id="reviewSaveSelected" class="review-save-selected">Save selected (<span id="reviewSelectedCount">0</span>)</button>
+      </div>
       <div class="review-list" id="reviewList"></div>
       <button id="closeReview" style="margin-top:16px;">Close</button>
     </div>
@@ -868,6 +920,10 @@ header {
     const reviewModal = document.getElementById('reviewModal');
     const reviewListEl = document.getElementById('reviewList');
     const closeReview = document.getElementById('closeReview');
+    const reviewBulkBar = document.getElementById('reviewBulkBar');
+    const reviewSelectAll = document.getElementById('reviewSelectAll');
+    const reviewSaveSelected = document.getElementById('reviewSaveSelected');
+    const reviewSelectedCount = document.getElementById('reviewSelectedCount');
 
     // Initialize
     async function init() {
@@ -1289,6 +1345,7 @@ header {
     // Review panel: list flagged designs, let Bruce pick the correct category from a dropdown
     async function openReviewPanel() {
       reviewModal.classList.add('show');
+      reviewBulkBar.style.display = 'none';
       reviewListEl.innerHTML = '<p style="color:var(--text2);">Loading...</p>';
 
       try {
@@ -1306,6 +1363,7 @@ header {
           ).join('');
           return `
             <div class="review-row" data-design-id="${item.id}">
+              <input type="checkbox" class="review-check">
               <img src="thumbs/${item.filename}" alt="${item.title}">
               <div class="review-info">
                 <div class="review-current">Currently: ${item.current_category}${item.suggested_category ? ` · Claude suggests: ${item.suggested_category}` : ' · no suggestion yet'}</div>
@@ -1315,10 +1373,56 @@ header {
             </div>
           `;
         }).join('');
+
+        reviewBulkBar.style.display = 'flex';
+        reviewSelectAll.checked = false;
+        updateSelectedCount();
       } catch (err) {
         console.error('Load flagged error:', err);
         reviewListEl.innerHTML = '<p style="color:var(--text2);">Failed to load. Please try again.</p>';
       }
+    }
+
+    function updateSelectedCount() {
+      const checked = reviewListEl.querySelectorAll('.review-check:checked').length;
+      reviewSelectedCount.textContent = checked;
+      reviewSaveSelected.classList.toggle('active', checked > 0);
+    }
+
+    async function doCorrectBatch(items) {
+      const password = prompt('Enter admin password:');
+      if (!password) return;
+
+      let failed = 0;
+      for (const { designId, category, rowEl } of items) {
+        try {
+          const res = await fetch(`${API_BASE}/api/correct`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ design_id: designId, category, password })
+          });
+          if (res.status === 403) {
+            alert('Wrong password');
+            return;
+          }
+          if (!res.ok) throw new Error('Correct failed');
+
+          rowEl.remove();
+          const design = designs.find(d => d.id === designId);
+          if (design) design.category = category;
+        } catch (err) {
+          console.error('Batch correct error:', err);
+          failed++;
+        }
+      }
+
+      applyFilters();
+      updateSelectedCount();
+      if (!reviewListEl.children.length) {
+        reviewListEl.innerHTML = '<p style="color:var(--text2);">No flagged designs. All clear.</p>';
+        reviewBulkBar.style.display = 'none';
+      }
+      if (failed) alert(`${failed} correction(s) failed. Please retry those.`);
     }
 
     async function doCorrect(designId, category, rowEl) {
@@ -1483,6 +1587,33 @@ header {
           const category = row.querySelector('.review-select').value;
           doCorrect(designId, category, row);
         }
+      });
+
+      reviewListEl.addEventListener('change', e => {
+        if (e.target.classList.contains('review-check')) {
+          updateSelectedCount();
+          const total = reviewListEl.querySelectorAll('.review-check').length;
+          const checked = reviewListEl.querySelectorAll('.review-check:checked').length;
+          reviewSelectAll.checked = total > 0 && checked === total;
+        }
+      });
+
+      reviewSelectAll.addEventListener('change', () => {
+        reviewListEl.querySelectorAll('.review-check').forEach(cb => {
+          cb.checked = reviewSelectAll.checked;
+        });
+        updateSelectedCount();
+      });
+
+      reviewSaveSelected.addEventListener('click', () => {
+        const rows = [...reviewListEl.querySelectorAll('.review-row')]
+          .filter(row => row.querySelector('.review-check').checked)
+          .map(row => ({
+            designId: row.dataset.designId,
+            category: row.querySelector('.review-select').value,
+            rowEl: row
+          }));
+        if (rows.length) doCorrectBatch(rows);
       });
 
       // Responsive top gallery
